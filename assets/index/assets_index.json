@@ -1,0 +1,725 @@
+[
+  {
+    "id": "icons_960px-Photosynthesis_en.svg",
+    "concept": "960px-Photosynthesis en",
+    "tags": [
+      "icons",
+      "960px-Photosynthesis en"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "960px-Photosynthesis_en.svg.svg"
+  },
+  {
+    "id": "biology_atp",
+    "concept": "atp",
+    "tags": [
+      "biology",
+      "energy",
+      "atp",
+      "mitochondria"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/atp.svg"
+  },
+  {
+    "id": "biology_bacteria",
+    "concept": "bacteria",
+    "tags": [
+      "biology",
+      "bacteria"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/bacteria.svg"
+  },
+  {
+    "id": "biology_bloodstream",
+    "concept": "bloodstream",
+    "tags": [
+      "biology",
+      "blood",
+      "circulation",
+      "respiration"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/bloodstream.svg"
+  },
+  {
+    "id": "biology_brain",
+    "concept": "brain",
+    "tags": [
+      "biology",
+      "brain"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/brain.svg"
+  },
+  {
+    "id": "biology_cell",
+    "concept": "cell",
+    "tags": [
+      "biology",
+      "cell",
+      "organism"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/cell.svg"
+  },
+  {
+    "id": "biology_chloroplast",
+    "concept": "chloroplast",
+    "tags": [
+      "biology",
+      "photosynthesis",
+      "plant",
+      "cell"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/chloroplast.svg"
+  },
+  {
+    "id": "biology_crossed-o2",
+    "concept": "crossed-o2",
+    "tags": [
+      "biology",
+      "crossed-o2"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/crossed-o2.svg"
+  },
+  {
+    "id": "biology_dna",
+    "concept": "dna",
+    "tags": [
+      "biology",
+      "dna"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/dna.svg"
+  },
+  {
+    "id": "biology_energy",
+    "concept": "energy",
+    "tags": [
+      "biology",
+      "energy"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/energy.svg"
+  },
+  {
+    "id": "biology_glucose",
+    "concept": "glucose",
+    "tags": [
+      "biology",
+      "sugar",
+      "glucose",
+      "energy"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/glucose.svg"
+  },
+  {
+    "id": "biology_heart",
+    "concept": "heart",
+    "tags": [
+      "biology",
+      "heart"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/heart.svg"
+  },
+  {
+    "id": "biology_leaf-svgrepo-com",
+    "concept": "leaf",
+    "tags": [
+      "biology",
+      "photosynthesis",
+      "plant"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/leaf-svgrepo-com.svg"
+  },
+  {
+    "id": "biology_leaf",
+    "concept": "leaf",
+    "tags": [
+      "biology",
+      "photosynthesis",
+      "plant"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/leaf.svg"
+  },
+  {
+    "id": "biology_lungs",
+    "concept": "lungs",
+    "tags": [
+      "biology",
+      "respiration",
+      "lungs",
+      "human organ",
+      "breathing"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/lungs.svg"
+  },
+  {
+    "id": "biology_mitochondria",
+    "concept": "mitochondria",
+    "tags": [
+      "biology",
+      "cell",
+      "mitochondria",
+      "energy",
+      "respiration"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/mitochondria.svg"
+  },
+  {
+    "id": "biology_oxygen",
+    "concept": "oxygen",
+    "tags": [
+      "biology",
+      "chemistry",
+      "oxygen",
+      "o2",
+      "molecule"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/oxygen.svg"
+  },
+  {
+    "id": "biology_photosynthesis-diagram",
+    "concept": "photosynthesis_diagram",
+    "tags": [
+      "biology",
+      "photosynthesis",
+      "diagram",
+      "plant"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/photosynthesis-diagram.svg"
+  },
+  {
+    "id": "biology_plant-svgrepo-com",
+    "concept": "plant",
+    "tags": [
+      "biology",
+      "photosynthesis",
+      "plant",
+      "tree"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/plant-svgrepo-com.svg"
+  },
+  {
+    "id": "biology_search-magnify-magnifier-glass-svgrepo-com",
+    "concept": "search-magnify-magnifier-glass",
+    "tags": [
+      "biology",
+      "zoom",
+      "magnify"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/search-magnify-magnifier-glass-svgrepo-com.svg"
+  },
+  {
+    "id": "biology_sun-svgrepo-com",
+    "concept": "sun",
+    "tags": [
+      "biology",
+      "sun"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/sun-svgrepo-com.svg"
+  },
+  {
+    "id": "biology_sun",
+    "concept": "sun",
+    "tags": [
+      "biology",
+      "sun"
+    ],
+    "style": "outline",
+    "category": "biology",
+    "path": "biology/sun.svg"
+  },
+  {
+    "id": "chemistry_atom",
+    "concept": "atom",
+    "tags": [
+      "chemistry",
+      "atom"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/atom.svg"
+  },
+  {
+    "id": "chemistry_co2",
+    "concept": "co2",
+    "tags": [
+      "chemistry",
+      "co2"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/co2.svg"
+  },
+  {
+    "id": "chemistry_ethanol",
+    "concept": "ethanol",
+    "tags": [
+      "chemistry",
+      "ethanol"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/ethanol.svg"
+  },
+  {
+    "id": "chemistry_flask",
+    "concept": "flask",
+    "tags": [
+      "chemistry",
+      "flask"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/flask.svg"
+  },
+  {
+    "id": "chemistry_molecule",
+    "concept": "molecule",
+    "tags": [
+      "chemistry",
+      "molecule"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/molecule.svg"
+  },
+  {
+    "id": "chemistry_o2",
+    "concept": "o2",
+    "tags": [
+      "chemistry",
+      "o2"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/o2.svg"
+  },
+  {
+    "id": "chemistry_water",
+    "concept": "water",
+    "tags": [
+      "chemistry",
+      "water"
+    ],
+    "style": "outline",
+    "category": "chemistry",
+    "path": "chemistry/water.svg"
+  },
+  {
+    "id": "computer_science_client",
+    "concept": "client",
+    "tags": [
+      "computer_science",
+      "network",
+      "tcp",
+      "client"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/client.svg"
+  },
+  {
+    "id": "computer_science_cloud",
+    "concept": "cloud",
+    "tags": [
+      "computer_science",
+      "cloud"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/cloud.svg"
+  },
+  {
+    "id": "computer_science_database",
+    "concept": "database",
+    "tags": [
+      "computer_science",
+      "database"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/database.svg"
+  },
+  {
+    "id": "computer_science_handshake",
+    "concept": "handshake",
+    "tags": [
+      "computer_science",
+      "tcp",
+      "network",
+      "protocol"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/handshake.svg"
+  },
+  {
+    "id": "computer_science_laptop",
+    "concept": "laptop",
+    "tags": [
+      "computer_science",
+      "laptop"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/laptop.svg"
+  },
+  {
+    "id": "computer_science_packet",
+    "concept": "packet",
+    "tags": [
+      "computer_science",
+      "network",
+      "data"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/packet.svg"
+  },
+  {
+    "id": "computer_science_server",
+    "concept": "server",
+    "tags": [
+      "computer_science",
+      "network",
+      "tcp",
+      "server"
+    ],
+    "style": "outline",
+    "category": "computer_science",
+    "path": "computer_science/server.svg"
+  },
+  {
+    "id": "diagrams_flow-box",
+    "concept": "flow-box",
+    "tags": [
+      "diagrams",
+      "flow-box"
+    ],
+    "style": "outline",
+    "category": "diagrams",
+    "path": "diagrams/flow-box.svg"
+  },
+  {
+    "id": "diagrams_pipeline-stage",
+    "concept": "pipeline-stage",
+    "tags": [
+      "diagrams",
+      "pipeline-stage"
+    ],
+    "style": "outline",
+    "category": "diagrams",
+    "path": "diagrams/pipeline-stage.svg"
+  },
+  {
+    "id": "humans_human",
+    "concept": "human",
+    "tags": [
+      "humans",
+      "human"
+    ],
+    "style": "outline",
+    "category": "humans",
+    "path": "humans/human.svg"
+  },
+  {
+    "id": "humans_person",
+    "concept": "person",
+    "tags": [
+      "humans",
+      "person"
+    ],
+    "style": "outline",
+    "category": "humans",
+    "path": "humans/person.svg"
+  },
+  {
+    "id": "icons_arrow-curved",
+    "concept": "arrow-curved",
+    "tags": [
+      "icons",
+      "arrow-curved"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "icons/arrows/arrow-curved.svg"
+  },
+  {
+    "id": "icons_arrow-down",
+    "concept": "arrow-down",
+    "tags": [
+      "icons",
+      "arrow-down"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "icons/arrows/arrow-down.svg"
+  },
+  {
+    "id": "icons_arrow-left",
+    "concept": "arrow-left",
+    "tags": [
+      "icons",
+      "arrow-left"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "icons/arrows/arrow-left.svg"
+  },
+  {
+    "id": "icons_arrow-right",
+    "concept": "arrow-right",
+    "tags": [
+      "icons",
+      "arrow-right"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "icons/arrows/arrow-right.svg"
+  },
+  {
+    "id": "icons_arrow-up",
+    "concept": "arrow-up",
+    "tags": [
+      "icons",
+      "arrow-up"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "icons/arrows/arrow-up.svg"
+  },
+  {
+    "id": "icons_unknown-concept",
+    "concept": "unknown-concept",
+    "tags": [
+      "icons",
+      "unknown-concept"
+    ],
+    "style": "outline",
+    "category": "icons",
+    "path": "icons/unknown-concept.svg"
+  },
+  {
+    "id": "math_array",
+    "concept": "array",
+    "tags": [
+      "math",
+      "computer_science",
+      "array",
+      "binary search"
+    ],
+    "style": "outline",
+    "category": "math",
+    "path": "math/array.svg"
+  },
+  {
+    "id": "math_chart_bar",
+    "concept": "chart bar",
+    "tags": [
+      "math",
+      "chart bar"
+    ],
+    "style": "outline",
+    "category": "math",
+    "path": "math/chart_bar.svg"
+  },
+  {
+    "id": "math_midpoint",
+    "concept": "midpoint",
+    "tags": [
+      "math",
+      "midpoint"
+    ],
+    "style": "outline",
+    "category": "math",
+    "path": "math/midpoint.svg"
+  },
+  {
+    "id": "math_pointer",
+    "concept": "pointer",
+    "tags": [
+      "math",
+      "pointer"
+    ],
+    "style": "outline",
+    "category": "math",
+    "path": "math/pointer.svg"
+  },
+  {
+    "id": "math_sorted_list",
+    "concept": "sorted list",
+    "tags": [
+      "math",
+      "sorted list"
+    ],
+    "style": "outline",
+    "category": "math",
+    "path": "math/sorted_list.svg"
+  },
+  {
+    "id": "physics_ball",
+    "concept": "ball",
+    "tags": [
+      "physics",
+      "motion",
+      "newton"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/ball.svg"
+  },
+  {
+    "id": "physics_car",
+    "concept": "car",
+    "tags": [
+      "physics",
+      "motion",
+      "vehicle",
+      "newton"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/car.svg"
+  },
+  {
+    "id": "physics_force",
+    "concept": "force",
+    "tags": [
+      "physics",
+      "force",
+      "arrow",
+      "newton"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/force.svg"
+  },
+  {
+    "id": "physics_friction",
+    "concept": "friction",
+    "tags": [
+      "physics",
+      "friction"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/friction.svg"
+  },
+  {
+    "id": "physics_lightbulb",
+    "concept": "lightbulb",
+    "tags": [
+      "physics",
+      "lightbulb"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/lightbulb.svg"
+  },
+  {
+    "id": "physics_magnet",
+    "concept": "magnet",
+    "tags": [
+      "physics",
+      "magnet"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/magnet.svg"
+  },
+  {
+    "id": "physics_pulley",
+    "concept": "pulley",
+    "tags": [
+      "physics",
+      "pulley"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/pulley.svg"
+  },
+  {
+    "id": "physics_rocket",
+    "concept": "rocket",
+    "tags": [
+      "physics",
+      "rocket"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/rocket.svg"
+  },
+  {
+    "id": "physics_wave",
+    "concept": "wave",
+    "tags": [
+      "physics",
+      "wave"
+    ],
+    "style": "outline",
+    "category": "physics",
+    "path": "physics/wave.svg"
+  },
+  {
+    "id": "icons_960px-Photosynthesis_en.svg",
+    "concept": "960px-Photosynthesis en",
+    "tags": [
+      "icons",
+      "960px-Photosynthesis en"
+    ],
+    "style": "raster",
+    "category": "icons",
+    "path": "960px-Photosynthesis_en.svg.png"
+  },
+  {
+    "id": "biology_photosynthesis-diagram",
+    "concept": "photosynthesis_diagram",
+    "tags": [
+      "biology",
+      "photosynthesis",
+      "diagram",
+      "plant"
+    ],
+    "style": "raster",
+    "category": "biology",
+    "path": "biology/photosynthesis-diagram.png"
+  }
+]

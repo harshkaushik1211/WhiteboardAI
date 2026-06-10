@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 240" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <path d="M40,20 Q75,45 40,70 Q5,95 40,120 Q75,145 40,170 Q5,195 40,220" data-path-length="450"/>
+  <path d="M80,20 Q45,45 80,70 Q115,95 80,120 Q45,145 80,170 Q115,195 80,220" data-path-length="450"/>
+  <path d="M40,45 L80,55 M40,95 L80,85 M40,145 L80,155 M40,195 L80,185" data-path-length="200"/>
+
+</svg>

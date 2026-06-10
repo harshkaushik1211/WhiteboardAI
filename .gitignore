@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+backend/venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+
+# Generated
+generated/
+videos/
+voices/
+avatar_cache/
+*.mp4
+*.mp3
+*.wav
+
+# Build
+frontend/.next/
+renderer/out/
+renderer/public/render-assets/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*

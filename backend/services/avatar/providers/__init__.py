@@ -1,0 +1,1 @@
+# Avatar providers sub-package

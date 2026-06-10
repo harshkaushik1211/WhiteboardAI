@@ -1,0 +1,15 @@
+{
+    "avatar_schema_version": 1,
+    "provider": "sadtalker",
+    "provider_version": "sadtalker_v1",
+    "audio_file": "teacher_short.wav",
+    "source_image": "teacher.png",
+    "sadtalker_config": {
+        "still": true,
+        "preprocess": "full",
+        "size": 256
+    },
+    "background_removal": {
+        "enabled": true
+    }
+}

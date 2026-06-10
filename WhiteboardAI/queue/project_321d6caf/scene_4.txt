@@ -1,0 +1,1 @@
+Applications include rocket launches, where fuel expels down and rocket moves up, illustrating action-reaction.

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <!-- hexose ring -->
+  <path d="M100,35 L145,60 L145,115 L100,140 L55,115 L55,60 Z" data-path-length="420"/>
+  <!-- CH2OH at C5 -->
+  <path d="M100,35 L100,15 M95,15 L105,15" data-path-length="35"/>
+  <path d="M100,15 L115,8" data-path-length="18"/>
+  <!-- OH groups -->
+  <path d="M145,60 L165,50" data-path-length="22"/>
+  <path d="M145,115 L168,125" data-path-length="25"/>
+  <path d="M55,115 L32,125" data-path-length="25"/>
+  <path d="M55,60 L35,48" data-path-length="24"/>
+  <circle cx="100" cy="90" r="6" fill="none" data-path-length="38"/>
+
+</svg>

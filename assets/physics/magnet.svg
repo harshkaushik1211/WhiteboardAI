@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 160" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <path d="M45,25 L45,115 Q45,140 70,140 Q95,140 95,115 L95,25" data-path-length="380"/>
+  <path d="M45,25 L28,10 M95,25 L112,10" data-path-length="50"/>
+  <path d="M28,10 L28,35 M112,10 L112,35" data-path-length="50"/>
+  <text x="52" y="85" font-size="14" fill="none" stroke="#1a1a2e">N</text>
+  <text x="52" y="105" font-size="14" fill="none" stroke="#1a1a2e">S</text>
+
+</svg>

@@ -1,0 +1,124 @@
+{
+  "topic": "photosynthesis",
+  "domain": "biology",
+  "diagram_mode": true,
+  "default_layout": "single_diagram",
+  "visual_plan_mode": "template_only",
+  "preferred_visuals": ["photosynthesis_diagram"],
+  "asset_catalog": ["photosynthesis_diagram"],
+  "animation_style": "whiteboard_draw",
+  "scene_hints": [
+    {
+      "scene_index": 0,
+      "headline": "Photosynthesis",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.0, "focusX": 960, "focusY": 520 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["photosynthesis", "diagram", "plant"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 1,
+      "headline": "What Is Photosynthesis?",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.08, "focusX": 960, "focusY": 500 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["plant", "food", "energy"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 2,
+      "headline": "Light Energy",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.75, "focusX": 520, "focusY": 280 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["light", "sun", "solar"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 3,
+      "headline": "Carbon Dioxide In",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.8, "focusX": 580, "focusY": 420 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["carbon dioxide", "co2", "leaf"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 4,
+      "headline": "Water From the Roots",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.75, "focusX": 820, "focusY": 720 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["water", "roots", "soil"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 5,
+      "headline": "Oxygen Out",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.75, "focusX": 1080, "focusY": 440 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["oxygen", "o2", "output"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 6,
+      "headline": "Glucose — Plant Food",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.85, "focusX": 620, "focusY": 380 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["carbohydrates", "glucose", "sugar"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    },
+    {
+      "scene_index": 7,
+      "headline": "The Full Process",
+      "layout_type": "single_diagram",
+      "camera": { "zoom": 1.05, "focusX": 960, "focusY": 520 },
+      "required_visuals": [
+        {
+          "concept": "photosynthesis_diagram",
+          "keywords": ["photosynthesis", "summary"],
+          "importance": "primary"
+        }
+      ],
+      "connections": []
+    }
+  ]
+}

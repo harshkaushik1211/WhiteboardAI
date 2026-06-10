@@ -1,0 +1,38 @@
+{
+  "topic": "respiration",
+  "domain": "biology",
+  "default_layout": "flow_diagram",
+  "scene_hints": [
+    {
+      "scene_index": 0,
+      "required_visuals": [
+        {"concept": "glucose", "keywords": ["glucose", "sugar"], "importance": "primary"},
+        {"concept": "oxygen", "keywords": ["oxygen", "o2"], "importance": "primary"}
+      ],
+      "connections": [{"from": "glucose", "to": "cell"}]
+    },
+    {
+      "scene_index": 1,
+      "required_visuals": [
+        {"concept": "lungs", "keywords": ["lungs", "breathing"], "importance": "primary"},
+        {"concept": "oxygen", "keywords": ["oxygen"], "importance": "secondary"}
+      ]
+    },
+    {
+      "scene_index": 2,
+      "required_visuals": [
+        {"concept": "cell", "keywords": ["cell"], "importance": "primary"},
+        {"concept": "mitochondria", "keywords": ["mitochondria", "energy"], "importance": "primary"}
+      ],
+      "connections": [{"from": "cell", "to": "mitochondria"}]
+    },
+    {
+      "scene_index": 3,
+      "required_visuals": [
+        {"concept": "mitochondria", "keywords": ["mitochondria"], "importance": "primary"},
+        {"concept": "atp", "keywords": ["atp", "energy"], "importance": "primary"}
+      ]
+    }
+  ],
+  "animation_style": "whiteboard_draw"
+}

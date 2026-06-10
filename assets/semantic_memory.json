@@ -1,0 +1,74 @@
+{
+  "respiration": {
+    "domain": "biology",
+    "preferred_visuals": ["lungs", "oxygen", "glucose", "bloodstream", "cell", "mitochondria", "atp"],
+    "preferred_layout": "flow_diagram",
+    "template": "biology/respiration"
+  },
+  "photosynthesis": {
+    "domain": "biology",
+    "diagram_mode": true,
+    "diagram_asset": "biology/photosynthesis-diagram.svg",
+    "preferred_visuals": ["photosynthesis_diagram"],
+    "asset_catalog": ["photosynthesis_diagram"],
+    "concept_asset_map": {
+      "photosynthesis_diagram": "biology/photosynthesis-diagram.svg",
+      "photosynthesis": "biology/photosynthesis-diagram.svg",
+      "diagram": "biology/photosynthesis-diagram.svg"
+    },
+    "allowed_paths": [
+      "biology/photosynthesis-diagram.svg"
+    ],
+    "allowed_asset_suffix": ".svg",
+    "preferred_layout": "single_diagram",
+    "template": "biology/photosynthesis",
+    "script_scenes": 8,
+    "script_guidance": "Eight scenes explaining photosynthesis using ONE diagram (already on screen). Scene 1: intro what photosynthesis is. Scene 2: plants make food from light. Scene 3: sunlight provides energy (yellow arrows). Scene 4: carbon dioxide enters the leaf. Scene 5: water absorbed by roots. Scene 6: oxygen released as waste. Scene 7: glucose/carbohydrates stored as food. Scene 8: summary equation in words (light + CO2 + water → sugar + oxygen). Short clear narration per scene; do not mention separate icons."
+  },
+  "plant photosynthesis": {
+    "domain": "biology",
+    "diagram_mode": true,
+    "diagram_asset": "biology/photosynthesis-diagram.svg",
+    "preferred_visuals": ["photosynthesis_diagram"],
+    "asset_catalog": ["photosynthesis_diagram"],
+    "concept_asset_map": {
+      "photosynthesis_diagram": "biology/photosynthesis-diagram.svg"
+    },
+    "allowed_paths": ["biology/photosynthesis-diagram.svg"],
+    "allowed_asset_suffix": ".svg",
+    "preferred_layout": "single_diagram",
+    "template": "biology/photosynthesis",
+    "script_scenes": 8,
+    "script_guidance": "Same eight-scene photosynthesis walkthrough using the single diagram."
+  },
+  "newton laws": {
+    "domain": "physics",
+    "preferred_visuals": ["car", "ball", "force", "friction", "rocket", "arrow-right"],
+    "preferred_layout": "process_pipeline",
+    "template": "physics/newton_laws"
+  },
+  "newton's laws": {
+    "domain": "physics",
+    "preferred_visuals": ["car", "ball", "force", "friction", "rocket"],
+    "preferred_layout": "process_pipeline",
+    "template": "physics/newton_laws"
+  },
+  "binary search": {
+    "domain": "math",
+    "preferred_visuals": ["array", "sorted_list", "midpoint", "pointer"],
+    "preferred_layout": "process_pipeline",
+    "template": "computer_science/binary_search"
+  },
+  "tcp handshake": {
+    "domain": "computer_science",
+    "preferred_visuals": ["client", "server", "packet", "handshake", "arrow-right"],
+    "preferred_layout": "process_pipeline",
+    "template": "computer_science/tcp_handshake"
+  },
+  "tcp": {
+    "domain": "computer_science",
+    "preferred_visuals": ["client", "server", "packet", "handshake"],
+    "preferred_layout": "process_pipeline",
+    "template": "computer_science/tcp_handshake"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "_comment": "Copy to svgrepo_manifest.json. Get URLs from https://www.svgrepo.com — open an icon, copy the address bar (e.g. .../svg/12345/lungs). CC0 license on most icons; check each icon page.",
+  "items": [
+    {
+      "url": "https://www.svgrepo.com/svg/489281/api",
+      "concept": "api",
+      "category": "computer_science",
+      "replace": true
+    },
+    {
+      "id": "489281",
+      "slug": "api",
+      "concept": "api",
+      "category": "computer_science",
+      "replace": false
+    }
+  ]
+}

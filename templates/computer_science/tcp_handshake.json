@@ -1,0 +1,7 @@
+{
+  "topic": "tcp handshake",
+  "domain": "computer_science",
+  "default_layout": "process_pipeline",
+  "preferred_visuals": ["client", "server", "packet", "handshake"],
+  "animation_style": "whiteboard_draw"
+}

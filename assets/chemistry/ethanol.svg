@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <circle cx="55" cy="55" r="18" data-path-length="113"/>
+  <circle cx="95" cy="40" r="16" data-path-length="100"/>
+  <circle cx="130" cy="55" r="16" data-path-length="100"/>
+  <path d="M73,48 L79,42 M111,48 L119,52 M95,56 L112,55" data-path-length="55"/>
+  <path d="M55,73 L55,95 M95,56 L95,95 M130,71 L130,95" data-path-length="80"/>
+  <text x="18" y="125" font-size="20" fill="none" stroke="#1a1a2e">C₂H₅OH</text>
+
+</svg>

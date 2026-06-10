@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 140" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <!-- outer membrane -->
+  <path d="M25,70 Q25,25 80,20 Q140,15 200,22 Q255,28 258,70 Q260,112 205,118 Q140,125 75,118 Q20,110 25,70 Z" data-path-length="520"/>
+  <!-- inner membrane -->
+  <path d="M40,70 Q42,38 90,34 Q140,30 190,36 Q232,42 235,70 Q237,98 192,102 Q140,106 88,100 Q38,94 40,70 Z" data-path-length="480"/>
+  <!-- cristae folds -->
+  <path d="M55,70 Q58,52 85,50 Q110,48 135,52 Q160,56 175,70" data-path-length="200"/>
+  <path d="M60,78 Q90,82 120,80 Q150,78 180,76" data-path-length="180"/>
+  <path d="M65,62 Q100,58 140,60 Q180,62 210,66" data-path-length="190"/>
+
+</svg>

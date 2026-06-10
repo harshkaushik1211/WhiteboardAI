@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <!-- trachea -->
+  <path d="M120,25 L120,75" data-path-length="50"/>
+  <!-- right bronchus + right lung (3 lobes) -->
+  <path d="M120,75 Q155,78 168,100 Q185,130 175,175 Q165,220 140,235 Q115,245 105,210 Q95,175 100,140 Q108,105 120,75" data-path-length="420"/>
+  <path d="M130,120 Q150,125 160,150" data-path-length="80"/>
+  <path d="M125,165 Q145,170 155,195" data-path-length="70"/>
+  <!-- left bronchus + left lung (2 lobes) -->
+  <path d="M120,75 Q85,78 72,100 Q55,130 65,175 Q75,220 100,235 Q125,245 135,210 Q145,175 140,140 Q132,105 120,75" data-path-length="400"/>
+  <path d="M110,130 Q90,135 80,160" data-path-length="75"/>
+  <!-- diaphragm -->
+  <path d="M60,245 Q120,265 180,245" data-path-length="130"/>
+
+</svg>

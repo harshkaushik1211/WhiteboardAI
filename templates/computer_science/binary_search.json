@@ -1,0 +1,7 @@
+{
+  "topic": "binary search",
+  "domain": "math",
+  "default_layout": "process_pipeline",
+  "preferred_visuals": ["array", "sorted_list", "midpoint", "pointer"],
+  "animation_style": "whiteboard_draw"
+}

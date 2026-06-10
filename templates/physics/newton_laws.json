@@ -1,0 +1,7 @@
+{
+  "topic": "newton laws",
+  "domain": "physics",
+  "default_layout": "process_pipeline",
+  "preferred_visuals": ["ball", "car", "force", "friction", "rocket"],
+  "animation_style": "whiteboard_draw"
+}

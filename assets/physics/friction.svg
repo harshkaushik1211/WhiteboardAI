@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <path d="M20,55 L140,55" data-path-length="120"/>
+  <rect x="20" y="40" width="40" height="30" rx="3" data-path-length="140"/>
+  <path d="M35,55 L30,72 M50,55 L45,74 M65,55 L70,72" data-path-length="55"/>
+  <text x="95" y="50" font-size="16" fill="none" stroke="#1a1a2e">friction</text>
+
+</svg>

@@ -1,0 +1,38 @@
+{
+  "project_id": "321d6caf",
+  "voice_provider": "f5tts",
+  "total_scenes": 5,
+  "created_at": "2026-06-04T14:11:35.251912+00:00",
+  "scenes": [
+    {
+      "scene_id": 1,
+      "title": "Draw an object at rest, then an arrow showing an external force applied to it, c",
+      "estimated_duration": 12.0,
+      "text_file": "scene_1.txt"
+    },
+    {
+      "scene_id": 2,
+      "title": "Illustrate a formula: F = m * a, with a mass and acceleration, showing force cal",
+      "estimated_duration": 12.0,
+      "text_file": "scene_2.txt"
+    },
+    {
+      "scene_id": 3,
+      "title": "Illustrate two objects with arrows showing action and reaction forces between th",
+      "estimated_duration": 12.0,
+      "text_file": "scene_3.txt"
+    },
+    {
+      "scene_id": 4,
+      "title": "Draw a rocket launching, with arrows showing fuel expulsion and upward rocket mo",
+      "estimated_duration": 12.0,
+      "text_file": "scene_4.txt"
+    },
+    {
+      "scene_id": 5,
+      "title": "Show various real-world examples like a ball being kicked, a car accelerating, a",
+      "estimated_duration": 12.0,
+      "text_file": "scene_5.txt"
+    }
+  ]
+}

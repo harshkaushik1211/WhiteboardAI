@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 100" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <path d="M15,50 Q70,25 140,50 Q210,75 265,50" data-path-length="320"/>
+  <path d="M15,58 Q70,78 140,58 Q210,38 265,58" data-path-length="320"/>
+  <path d="M40,50 L50,42 M90,54 L100,46 M150,46 L160,54 M200,42 L210,50" data-path-length="80"/>
+  <!-- red cells hint -->
+  <ellipse cx="80" cy="50" rx="18" ry="10" data-path-length="90"/>
+  <ellipse cx="180" cy="52" rx="18" ry="10" data-path-length="90"/>
+
+</svg>

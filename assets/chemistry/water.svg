@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 110" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+
+  <circle cx="50" cy="52" r="24" data-path-length="150"/>
+  <circle cx="82" cy="52" r="18" data-path-length="113"/>
+  <path d="M68,52 L64,52" data-path-length="4"/>
+  <text x="38" y="95" font-size="18" fill="none" stroke="#1a1a2e">H₂O</text>
+
+</svg>
