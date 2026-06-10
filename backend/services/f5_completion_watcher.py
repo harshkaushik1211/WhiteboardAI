@@ -31,6 +31,7 @@ class F5CompletionWatcher:
     def __init__(self) -> None:
         self.importer = F5ImportService()
         self.is_running = False
+        self.warned_skipped_projects: set[str] = set()
 
     async def start(self) -> None:
         """Start the background watcher loop."""
@@ -106,7 +107,9 @@ class F5CompletionWatcher:
         # Verify project exists locally
         local_cfg = load_json(project_id, "config.json")
         if not local_cfg:
-            logger.warning(f"[F5_WATCHER] Project {project_id} found on Drive completed folder but not found locally. Skipping.")
+            if project_id not in self.warned_skipped_projects:
+                logger.warning(f"[F5_WATCHER] Project {project_id} found on Drive completed folder but not found locally. Skipping.")
+                self.warned_skipped_projects.add(project_id)
             return
 
         # 1. Import duplicate protection (refinement #7)

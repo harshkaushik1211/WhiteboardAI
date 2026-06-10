@@ -61,6 +61,9 @@ async def build_scene_plans_from_semantic(
     ensure_project_dirs(project_id)
 
     for semantic in semantic_plans:
+        from services.action_mapper import map_action_to_motion
+        rv_map = {rv.concept.lower(): rv for rv in semantic.required_visuals}
+
         retrieved = svg_retriever.retrieve_assets(
             semantic.required_visuals,
             topic,
@@ -99,8 +102,6 @@ async def build_scene_plans_from_semantic(
         )
 
         # Post-process elements to attach actions, intents, and relationship links (Component 2 & 5)
-        from services.action_mapper import map_action_to_motion
-        rv_map = {rv.concept.lower(): rv for rv in semantic.required_visuals}
         concept_to_id = {el.concept.lower(): el.id for el in plan.elements if el.concept}
         
         for el in plan.elements:
