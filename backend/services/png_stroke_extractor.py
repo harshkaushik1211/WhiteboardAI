@@ -1,19 +1,23 @@
 """
-Object-wise stroke order for whiteboard PNGs (storyboard-ai grid walk, no SAM).
+Object-wise stroke extraction for whiteboard PNGs.
 
-Uses connected components to split ink blobs into objects, then nearest-neighbor
-grid traversal per object for a natural hand-drawn reveal order.
+Primary: OpenAI Vision bboxes → crop → edge detect → contour → SVG paths.
+Fallback: OpenCV connected-components grid walk.
 """
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
 
 from config import settings
+
+logger = logging.getLogger("png_stroke_extractor")
 
 
 def _euc_dist(arr: np.ndarray, point: np.ndarray) -> np.ndarray:
@@ -52,7 +56,6 @@ def _grid_cells_for_mask(
     split_len: int,
     black_pixel_threshold: int,
 ) -> List[Tuple[int, int]]:
-    """Return grid (row, col) indices in nearest-neighbor draw order."""
     img_copy = img_thresh.copy()
     if object_mask is not None:
         img_copy[object_mask == 0] = 255
@@ -92,23 +95,15 @@ def _grid_cells_for_mask(
     return order
 
 
-def extract_stroke_data(
+def _extract_opencv_grid_stroke_data(
     image_path: Path,
-    output_path: Path | None = None,
-    width: int | None = None,
-    height: int | None = None,
-    split_len: int | None = None,
-    min_component_area: int | None = None,
+    width: int,
+    height: int,
+    split_len: int,
+    min_component_area: int,
     black_pixel_threshold: int = 10,
 ) -> Dict:
-    """
-    Build stroke manifest: ordered grid cells per connected ink object.
-    """
-    width = width or settings.png_stroke_width
-    height = height or settings.png_stroke_height
-    split_len = split_len or settings.png_stroke_split_len
-    min_component_area = min_component_area or settings.png_stroke_min_area
-
+    """Legacy grid-cell fallback."""
     img = cv2.imread(str(image_path))
     if img is None:
         raise ValueError(f"Could not read image: {image_path}")
@@ -135,7 +130,7 @@ def extract_stroke_data(
     components.sort(key=lambda t: (t[0], t[1]))
 
     all_cells: List[List[int]] = []
-    objects: List[Dict[str, int]] = []
+    objects: List[Dict] = []
 
     for _cy, _cx, label_id, area in components:
         obj_mask = (labels == label_id).astype(np.uint8) * 255
@@ -161,38 +156,138 @@ def extract_stroke_data(
         )
         objects = [{"start": 0, "end": len(all_cells), "area": 0, "bbox": bbox}]
 
-    ink_bgr = cv2.cvtColor(img_thresh, cv2.COLOR_GRAY2BGR)
-    rel_ink = ink_image_path_for_sketch(f"assets/{image_path.name}")
-    if output_path is not None:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        ink_path = output_path.parent / f"{image_path.stem}-ink.png"
-        cv2.imwrite(str(ink_path), ink_bgr)
-
-    data = {
+    return {
         "width": width,
         "height": height,
+        "stroke_mode": "grid",
+        "segmentation_backend": "opencv",
         "split_len": split_len,
         "cells": all_cells,
         "objects": objects,
         "cell_count": len(all_cells),
         "object_count": len(objects),
-        "ink_image": rel_ink,
+        "paths": [],
+        "path_count": 0,
     }
 
+
+def _run_async(coro):
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro)
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(asyncio.run, coro).result()
+
+
+async def _extract_stroke_data_async(
+    image_path: Path,
+    width: int,
+    height: int,
+    object_hints: Optional[List[str]],
+    visual_description: str,
+    debug_output_path: Optional[Path],
+) -> Dict:
+    backend = (settings.stroke_backend or "vision_contour").lower()
+
+    if backend == "opencv":
+        return _extract_opencv_grid_stroke_data(
+            image_path,
+            width,
+            height,
+            settings.png_stroke_split_len,
+            settings.png_stroke_min_area,
+        )
+
+    try:
+        from services.stroke.vision_contour_pipeline import extract_vision_contour_stroke_data
+
+        return await extract_vision_contour_stroke_data(
+            image_path,
+            width,
+            height,
+            object_hints=object_hints,
+            visual_description=visual_description,
+            debug_output_path=debug_output_path,
+        )
+    except Exception as exc:
+        logger.warning("Vision contour extraction failed (%s); falling back to opencv", exc)
+        return _extract_opencv_grid_stroke_data(
+            image_path,
+            width,
+            height,
+            settings.png_stroke_split_len,
+            settings.png_stroke_min_area,
+        )
+
+
+def extract_stroke_data(
+    image_path: Path,
+    output_path: Path | None = None,
+    width: int | None = None,
+    height: int | None = None,
+    split_len: int | None = None,
+    min_component_area: int | None = None,
+    black_pixel_threshold: int = 10,
+    object_hints: Optional[List[str]] = None,
+    visual_description: str = "",
+    debug_output_path: Path | None = None,
+) -> Dict:
+    width = width or settings.png_stroke_width
+    height = height or settings.png_stroke_height
+    split_len = split_len or settings.png_stroke_split_len
+    del min_component_area, black_pixel_threshold, split_len
+
+    normalize_sketch_png(image_path)
+
+    data = _run_async(
+        _extract_stroke_data_async(
+            image_path,
+            width,
+            height,
+            object_hints,
+            visual_description,
+            debug_output_path,
+        )
+    )
+
+    img = cv2.imread(str(image_path))
+    if img is not None:
+        img = cv2.resize(img, (width, height))
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_thresh = cv2.adaptiveThreshold(
+            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 10
+        )
+        from services.stroke.contour_to_svg import build_ink_image
+
+        ink_bgr = build_ink_image(img_thresh)
+        rel_ink = ink_image_path_for_sketch(f"assets/{image_path.name}")
+        data["ink_image"] = rel_ink
+        if output_path is not None:
+            ink_path = output_path.parent / f"{image_path.stem}-ink.png"
+            cv2.imwrite(str(ink_path), ink_bgr)
+
     if output_path is not None:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(data), encoding="utf-8")
 
     return data
 
 
 def stroke_json_path_for_sketch(rel_image_path: str) -> str:
-    """assets/scene-1-sketch.png -> assets/scene-1-sketch-strokes.json"""
     p = Path(rel_image_path)
     return str(p.parent / f"{p.stem}-strokes.json")
 
 
+def vision_debug_json_path_for_sketch(rel_image_path: str) -> str:
+    p = Path(rel_image_path)
+    stem = p.stem.replace("-sketch", "")
+    return str(p.parent / f"{stem}-vision-debug.json")
+
+
 def normalize_sketch_png(image_path: Path) -> Tuple[int, int]:
-    """Resize color sketch on disk to stroke canvas size so ink/color/cells align."""
     width = settings.png_stroke_width
     height = settings.png_stroke_height
     img = cv2.imread(str(image_path))
@@ -203,26 +298,50 @@ def normalize_sketch_png(image_path: Path) -> Tuple[int, int]:
     return width, height
 
 
-def extract_strokes_for_project_image(project_id: str, rel_image_path: str) -> str:
+def extract_strokes_for_project_image(
+    project_id: str,
+    rel_image_path: str,
+    object_hints: Optional[List[str]] = None,
+    visual_description: str = "",
+) -> str:
     from utils.file_manager import project_dir
 
     proj = project_dir(project_id)
     image_path = proj / rel_image_path
-    normalize_sketch_png(image_path)
     rel_stroke = stroke_json_path_for_sketch(rel_image_path)
     out_path = proj / rel_stroke
-    extract_stroke_data(image_path, out_path)
+    debug_path = proj / vision_debug_json_path_for_sketch(rel_image_path)
+    extract_stroke_data(
+        image_path,
+        out_path,
+        object_hints=object_hints,
+        visual_description=visual_description,
+        debug_output_path=debug_path,
+    )
     return rel_stroke
 
 
 def backfill_stroke_assets_for_project(project_id: str) -> int:
-    """Regenerate *-strokes.json and *-ink.png for existing sketch PNGs."""
-    from utils.file_manager import project_dir
+    from utils.file_manager import load_json, project_dir
 
     proj = project_dir(project_id)
+    script = load_json(project_id, "script.json") or {}
+    scenes_by_id = {s.get("scene_id"): s for s in script.get("scenes", [])}
+
     count = 0
     for png in sorted(proj.glob("assets/scene-*-sketch.png")):
         rel = str(png.relative_to(proj))
-        extract_strokes_for_project_image(project_id, rel)
+        scene_id = None
+        try:
+            scene_id = int(png.stem.split("-")[1])
+        except (IndexError, ValueError):
+            pass
+        scene = scenes_by_id.get(scene_id, {}) if scene_id else {}
+        extract_strokes_for_project_image(
+            project_id,
+            rel,
+            object_hints=scene.get("keywords"),
+            visual_description=scene.get("visual_description", ""),
+        )
         count += 1
     return count

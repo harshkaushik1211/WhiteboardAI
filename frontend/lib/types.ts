@@ -72,6 +72,11 @@ export interface AiImageAuditEntry {
   image_prompt: string;
   model: string;
   visual_mode: string;
+  stroke_mode?: string;
+  segmentation_backend?: string;
+  object_labels?: string[];
+  path_count?: number;
+  object_count?: number;
 }
 
 export type VoiceProvider = "edge" | "f5tts";

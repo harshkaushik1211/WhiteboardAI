@@ -3,6 +3,7 @@ import { useCurrentFrame } from "remotion";
 import type { RenderElement } from "../types/manifest";
 import { SVGAnimator } from "./SVGAnimator";
 import { DiagramImage } from "./DiagramImage";
+import { ContourStrokeReveal } from "./ContourStrokeReveal";
 import { ObjectWiseSketchReveal } from "./ObjectWiseSketchReveal";
 import { SketchWipeReveal } from "./SketchWipeReveal";
 
@@ -182,6 +183,23 @@ export const WhiteboardCanvas: React.FC<WhiteboardCanvasProps> = ({
               el.animation === "sketch_reveal" ||
               (el.id && el.id.endsWith("-sketch"))
             ) {
+              if (el.stroke_data?.stroke_mode === "svg_contour") {
+                return (
+                  <ContourStrokeReveal
+                    key={el.id}
+                    src={el.image_src}
+                    inkSrc={el.ink_image_src}
+                    strokeData={el.stroke_data}
+                    startFrame={el.start_frame}
+                    endFrame={el.end_frame}
+                    x={0}
+                    y={0}
+                    width={w}
+                    height={h}
+                    color={el.color}
+                  />
+                );
+              }
               if (el.stroke_data?.cells?.length) {
                 return (
                   <ObjectWiseSketchReveal

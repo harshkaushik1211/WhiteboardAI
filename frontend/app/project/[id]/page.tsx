@@ -150,7 +150,13 @@ export default function ProjectPage() {
           <Card className="mb-8">
             <h3 className="font-semibold mb-4">AI whiteboard images (PNG)</h3>
             <p className="text-sm text-white/50 mb-4">
-              Model: {project.ai_image_audit[0]?.model} — storyboard-style raster sketches
+              Model: {project.ai_image_audit[0]?.model}
+              {project.ai_image_audit[0]?.stroke_mode
+                ? ` — ${project.ai_image_audit[0].stroke_mode}`
+                : ""}
+              {project.ai_image_audit[0]?.segmentation_backend
+                ? ` (${project.ai_image_audit[0].segmentation_backend})`
+                : ""}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {project.ai_image_audit.map((entry) => (
@@ -161,6 +167,12 @@ export default function ProjectPage() {
                   <p className="font-medium text-brand-300 mb-2">
                     Scene {entry.scene_id}: {entry.headline}
                   </p>
+                  {entry.object_labels && entry.object_labels.length > 0 && (
+                    <p className="text-xs text-white/40 mb-2">
+                      Objects: {entry.object_labels.join(", ")}
+                      {entry.path_count != null ? ` · ${entry.path_count} paths` : ""}
+                    </p>
+                  )}
                   <img
                     src={`${API_BASE}/media/projects/${projectId}/${entry.image_path}`}
                     alt={entry.headline}

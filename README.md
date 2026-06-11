@@ -7,7 +7,7 @@ Generate polished animated educational whiteboard videos locally from a single t
 - Topic → Script → AI whiteboard image per scene → Stroke reveal → Voice → Remotion → MP4
 - OpenAI GPT-4o for script and lesson planning
 - `gpt-image-1-mini` generates one whiteboard PNG per scene
-- Object-wise stroke-reveal animation (storyboard-ai style)
+- Enhanced stroke reveal: OpenAI Vision bboxes → contour → SVG paths (storyboard-ai style, no SAM3)
 - Edge-TTS for narration (free, local)
 - Remotion + FFmpeg for local rendering
 - Next.js 14 UI with preview and export
@@ -68,7 +68,7 @@ chmod +x scripts/*.sh
 1. User enters topic + duration + voice style
 2. OpenAI generates educational script with scenes
 3. `gpt-image-1-mini` draws one whiteboard PNG per scene
-4. Stroke extractor builds object-wise reveal order
+4. OpenAI Vision bboxes → edge detection → contour SVG paths per object
 5. Edge-TTS generates narration per scene
 6. Timeline sync builds `render_manifest.json`
 7. Remotion renders 1080p video with stroke animation
@@ -88,8 +88,14 @@ Each scene:
 
 1. GPT writes an image prompt from narration + visual description
 2. `gpt-image-1-mini` generates a 1536×1024 whiteboard PNG
-3. Stroke extractor segments ink and orders grid cells for reveal
-4. Remotion animates ink → color object-by-object
+3. OpenAI Vision returns object bounding boxes
+4. Each crop: Canny edges → contours → SVG paths
+5. Remotion animates paths object-by-object, then fills color
+
+```bash
+STROKE_BACKEND=vision_contour
+SEGMENTATION_VISION_MODEL=gpt-4o-mini
+```
 
 Env (optional in `.env`):
 

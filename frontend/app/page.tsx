@@ -94,7 +94,7 @@ export default function HomePage() {
           <TopicInput value={topic} onChange={setTopic} />
 
           <p className="text-xs text-white/40 -mt-4">
-            Each scene: gpt-image-1-mini PNG → object-wise stroke reveal (storyboard-ai style).
+            Each scene: gpt-image-1-mini PNG → Vision bboxes → contour SVG stroke reveal.
           </p>
 
           <div className="space-y-2">
