@@ -22,7 +22,6 @@ from models.schemas import (
 )
 from services.llm_service import llm_service
 from services.scene_planner import plan_scenes_for_script
-from services.svg_generator import generate_svgs_for_project
 from services.voice_service import generate_voices_for_script  # kept for backward compat
 from services.voice.factory import get_voice_provider, get_provider_key
 from services.voice.exporter import F5ExportService
@@ -238,6 +237,7 @@ async def generate_script(req: GenerateScriptRequest):
 
     # Persist full config including educational level and new voice/avatar provider fields.
     config = req.model_dump()
+    config["visual_mode"] = "ai_image"
     config["voice_generation_status"] = "pending"
     config["f5_package_exported"] = False
     config["avatar_status"] = None      # future hook — liveportrait | musetalk | sadtalker
@@ -272,21 +272,18 @@ async def generate_scenes(req: GenerateScenesRequest):
 
 @router.post("/generate-svg")
 async def generate_svg(req: GenerateSvgRequest):
+    """Legacy alias — AI image visuals are produced in /generate-scenes."""
     data = load_json(req.project_id, "scene_plans.json")
     if not data:
-        script = _get_script(req.project_id)
-        config = load_json(req.project_id, "config.json") or {}
-        topic = config.get("topic", script.title)
-        scene_plans = await plan_scenes_for_script(req.project_id, script, topic)
-    else:
-        scene_plans = [ScenePlanSchema.model_validate(p) for p in data]
-
-    svg_map = await generate_svgs_for_project(req.project_id, scene_plans)
+        raise HTTPException(
+            404, "Scene plans not found. Run /generate-scenes first (generates PNG + stroke data)."
+        )
+    scene_plans = [ScenePlanSchema.model_validate(p) for p in data]
     save_json(req.project_id, "status.json", {"step": PipelineStep.SVG.value})
 
     return {
         "project_id": req.project_id,
-        "svg_files": list(svg_map.values()),
+        "svg_files": [],
         "scene_plans": [p.model_dump() for p in scene_plans],
     }
 
@@ -534,55 +531,6 @@ async def import_f5_audio(
         # Structured validation report (#7)
         "validation_report": validation_report,
     }
-
-
-@router.post("/assets/reindex")
-async def reindex_assets():
-    from services.svg_indexer import rebuild_index
-    from services.svg_retriever import svg_retriever
-
-    entries = rebuild_index()
-    svg_retriever.reload()
-    return {"status": "ok", "count": len(entries)}
-
-
-@router.post("/assets/svgrepo/download")
-async def download_svgrepo_asset(body: dict):
-    """Download one icon from svgrepo.com into assets/{category}/{concept}.svg"""
-    from config import settings
-    from services.svg_indexer import rebuild_index
-    from services.svg_retriever import svg_retriever
-    from services.svgrepo_client import DownloadItem, download_item
-
-    url = body.get("url", "")
-    concept = body.get("concept")
-    if not url or not concept:
-        raise HTTPException(status_code=400, detail="url and concept are required")
-
-    try:
-        path = download_item(
-            DownloadItem(
-                url=url,
-                concept=concept,
-                category=body.get("category", "biology"),
-                replace=body.get("replace", True),
-                icon_id=body.get("id") or body.get("icon_id"),
-                slug=body.get("slug"),
-            ),
-            settings.assets_path,
-            delay_sec=0,
-        )
-        count = len(rebuild_index())
-        svg_retriever.reload()
-        return {
-            "status": "ok",
-            "path": str(path.relative_to(settings.assets_path)),
-            "index_count": count,
-        }
-    except FileExistsError as e:
-        raise HTTPException(status_code=409, detail=str(e))
-    except (ValueError, RuntimeError) as e:
-        raise HTTPException(status_code=502, detail=str(e))
 
 
 @router.get("/project/{project_id}/f5-status")

@@ -11,7 +11,6 @@ import { TimelineView } from "@/components/TimelineView";
 import {
   getProject,
   generateScenes,
-  generateSvg,
   generateVoice,
   renderVideo,
   API_BASE,
@@ -117,15 +116,7 @@ export default function ProjectPage() {
               }
             >
               <Image className="w-4 h-4 mr-1" />
-              {stepLoading === "scenes" ? "..." : "Scenes"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!!stepLoading}
-              onClick={() => runStep("svg", () => generateSvg(projectId))}
-            >
-              SVGs
+              {stepLoading === "scenes" ? "..." : "Images"}
             </Button>
             <Button
               variant="outline"
@@ -159,7 +150,13 @@ export default function ProjectPage() {
           <Card className="mb-8">
             <h3 className="font-semibold mb-4">AI whiteboard images (PNG)</h3>
             <p className="text-sm text-white/50 mb-4">
-              Model: {project.ai_image_audit[0]?.model} — storyboard-style raster sketches
+              Model: {project.ai_image_audit[0]?.model}
+              {project.ai_image_audit[0]?.stroke_mode
+                ? ` — ${project.ai_image_audit[0].stroke_mode}`
+                : ""}
+              {project.ai_image_audit[0]?.segmentation_backend
+                ? ` (${project.ai_image_audit[0].segmentation_backend})`
+                : ""}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {project.ai_image_audit.map((entry) => (
@@ -170,60 +167,17 @@ export default function ProjectPage() {
                   <p className="font-medium text-brand-300 mb-2">
                     Scene {entry.scene_id}: {entry.headline}
                   </p>
+                  {entry.object_labels && entry.object_labels.length > 0 && (
+                    <p className="text-xs text-white/40 mb-2">
+                      Objects: {entry.object_labels.join(", ")}
+                      {entry.path_count != null ? ` · ${entry.path_count} paths` : ""}
+                    </p>
+                  )}
                   <img
                     src={`${API_BASE}/media/projects/${projectId}/${entry.image_path}`}
                     alt={entry.headline}
                     className="w-full rounded bg-white"
                   />
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {project.ai_sketch_audit && project.ai_sketch_audit.length > 0 && (
-          <Card className="mb-8">
-            <h3 className="font-semibold mb-4">AI line art sketches</h3>
-            <p className="text-sm text-white/50 mb-4">
-              Visual mode: {(project.config?.visual_mode as string) || "ai_line_art"} — model{" "}
-              {project.ai_sketch_audit[0]?.model}
-            </p>
-            <div className="space-y-6">
-              {project.ai_sketch_audit.map((entry) => (
-                <div
-                  key={entry.scene_id}
-                  className="rounded-lg border border-white/10 p-4 bg-white/5"
-                >
-                  <p className="font-medium text-brand-300 mb-3">
-                    Scene {entry.scene_id}: {entry.headline}
-                    {entry.layer_count ? ` (${entry.layer_count} layers)` : ""}
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {(entry.layers?.length
-                      ? entry.layers
-                      : entry.svg_path
-                        ? [
-                            {
-                              layer_index: 1,
-                              label: "sketch",
-                              svg_path: entry.svg_path,
-                              path_count: entry.path_count ?? 0,
-                            },
-                          ]
-                        : []
-                    ).map((layer) => (
-                      <div key={layer.layer_index}>
-                        <p className="text-xs text-white/50 mb-1">
-                          Layer {layer.layer_index}: {layer.label} ({layer.path_count} paths)
-                        </p>
-                        <img
-                          src={`${API_BASE}/media/projects/${projectId}/${layer.svg_path}`}
-                          alt={layer.label}
-                          className="w-full rounded bg-white"
-                        />
-                      </div>
-                    ))}
-                  </div>
                 </div>
               ))}
             </div>
