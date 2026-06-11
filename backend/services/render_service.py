@@ -154,38 +154,17 @@ async def run_full_pipeline(
             "educational_level": educational_level,
         })
 
-        from services.visual_mode import is_ai_image, is_ai_line_art
-
-        if is_ai_image(project_id):
-            job_queue.update_job(
-                job_id,
-                step=PipelineStep.SCENES,
-                progress=20,
-                message="Generating AI whiteboard images (PNG)...",
-            )
-        elif is_ai_line_art(project_id):
-            job_queue.update_job(
-                job_id,
-                step=PipelineStep.SCENES,
-                progress=20,
-                message="Generating AI line art per scene...",
-            )
-        else:
-            job_queue.update_job(
-                job_id,
-                step=PipelineStep.SCENES,
-                progress=20,
-                message="Planning semantic visuals...",
-            )
+        job_queue.update_job(
+            job_id,
+            step=PipelineStep.SCENES,
+            progress=20,
+            message="Generating AI whiteboard images (PNG)...",
+        )
         scene_plans, _audit = await build_visual_scenes(project_id, script, topic)
 
-        if is_ai_image(project_id):
-            svg_msg = "AI images saved..."
-        elif is_ai_line_art(project_id):
-            svg_msg = "AI sketches saved..."
-        else:
-            svg_msg = "Assets retrieved and laid out..."
-        job_queue.update_job(job_id, step=PipelineStep.SVG, progress=35, message=svg_msg)
+        job_queue.update_job(
+            job_id, step=PipelineStep.SVG, progress=35, message="AI images and stroke data saved..."
+        )
 
         # -----------------------------------------------------------------
         # Voice generation — provider-aware

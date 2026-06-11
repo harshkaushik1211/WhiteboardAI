@@ -74,7 +74,6 @@ export interface AiImageAuditEntry {
   visual_mode: string;
 }
 
-export type VisualMode = "library" | "ai_line_art" | "ai_image";
 export type VoiceProvider = "edge" | "f5tts";
 
 export type AvatarProvider = "liveportrait" | "musetalk" | "sadtalker" | null;
@@ -85,7 +84,6 @@ export interface GenerateConfig {
   style: string;
   voice: string;
   language: string;
-  visual_mode?: VisualMode;
   voice_provider?: VoiceProvider;
   avatar_provider?: AvatarProvider;
 }

@@ -30,14 +30,7 @@ app.include_router(websocket.router, tags=["websocket"])
 
 
 @app.on_event("startup")
-async def startup_build_asset_index():
-    from services.svg_indexer import get_index
-    from services.svg_retriever import svg_retriever
-
-    entries = get_index()
-    svg_retriever.reload()
-    print(f"SVG asset index loaded: {len(entries)} assets")
-
+async def startup_services():
     # Start F5 Completion Watcher (Phase-2)
     from services.f5_completion_watcher import F5CompletionWatcher
     watcher = F5CompletionWatcher()

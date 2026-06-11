@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     png_stroke_height: int = 1080
     png_stroke_split_len: int = 10
     png_stroke_min_area: int = 120
-    visual_mode_default: str = "library"
     port: int = 8000
     backend_url: str = "http://localhost:8000"
     frontend_url: str = "http://localhost:3000"

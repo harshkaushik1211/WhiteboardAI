@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TopicInput } from "@/components/TopicInput";
 import { generateScript, renderVideo } from "@/lib/api";
-import type { VisualMode, VoiceProvider } from "@/lib/types";
+import type { VoiceProvider } from "@/lib/types";
 
 export default function HomePage() {
   const router = useRouter();
@@ -16,7 +16,6 @@ export default function HomePage() {
   const [style, setStyle] = useState("whiteboard");
   const [voice, setVoice] = useState("male");
   const [voiceProvider, setVoiceProvider] = useState<VoiceProvider>("edge");
-  const [visualMode, setVisualMode] = useState<"library" | "ai_line_art" | "ai_image">("library");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -34,7 +33,6 @@ export default function HomePage() {
         style,
         voice,
         language: "english",
-        visual_mode: visualMode,
         voice_provider: voiceProvider,
         avatar_provider: null,
       });
@@ -61,7 +59,6 @@ export default function HomePage() {
         style,
         voice,
         language: "english",
-        visual_mode: visualMode,
         voice_provider: voiceProvider,
         avatar_provider: null,
       });
@@ -89,28 +86,16 @@ export default function HomePage() {
             <span className="text-brand-400"> Whiteboard Video</span>
           </h1>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Golpo-style animated explainers. Script, visuals, voice, and MP4 — all generated locally on your machine.
+            GPT-generated whiteboard sketches per scene, stroke-reveal animation, voice, and MP4 — all local.
           </p>
         </div>
 
         <Card className="space-y-8">
           <TopicInput value={topic} onChange={setTopic} />
 
-          <div className="space-y-2">
-            <label className="text-sm text-white/70">Visual source</label>
-            <select
-              value={visualMode}
-              onChange={(e) => setVisualMode(e.target.value as VisualMode)}
-              className="w-full h-10 rounded-lg bg-white/5 border border-white/20 px-3 text-white"
-            >
-              <option value="library">Asset library (curated SVGs)</option>
-              <option value="ai_line_art">AI line art (SVG layers, stroke reveal)</option>
-              <option value="ai_image">AI image (PNG, object-wise stroke reveal)</option>
-            </select>
-            <p className="text-xs text-white/40">
-              Line art: gpt-4o-mini SVG. Image: gpt-image-1-mini PNG + draw-on wipe (like storyboard-ai, no SAM).
-            </p>
-          </div>
+          <p className="text-xs text-white/40 -mt-4">
+            Each scene: gpt-image-1-mini PNG → object-wise stroke reveal (storyboard-ai style).
+          </p>
 
           <div className="space-y-2">
             <label className="text-sm text-white/70">Voice provider</label>
@@ -208,8 +193,8 @@ export default function HomePage() {
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           {[
-            { title: "Script + Scenes", desc: "OpenAI generates educational breakdown" },
-            { title: "SVG Animation", desc: "Hand-drawn stroke reveal like VideoScribe" },
+            { title: "Script + Scenes", desc: "OpenAI writes the lesson scene-by-scene" },
+            { title: "AI Sketches", desc: "gpt-image-1-mini PNG per scene, stroke reveal" },
             { title: "Local Render", desc: "Remotion + FFmpeg on your machine" },
           ].map((f) => (
             <div key={f.title} className="glass rounded-xl p-6">

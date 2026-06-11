@@ -39,13 +39,6 @@ export async function generateScenes(projectId: string) {
   );
 }
 
-export async function generateSvg(projectId: string) {
-  return fetchApi<{ project_id: string; svg_files: string[]; scene_plans: ScenePlan[] }>(
-    "/generate-svg",
-    { method: "POST", body: JSON.stringify({ project_id: projectId }) }
-  );
-}
-
 export async function generateVoice(projectId: string) {
   return fetchApi<{ project_id: string; voice_files: string[] }>(
     "/generate-voice",
