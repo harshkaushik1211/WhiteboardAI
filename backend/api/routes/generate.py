@@ -79,11 +79,84 @@ async def generate_script(req: GenerateScriptRequest):
         f"scenes={lesson_plan_obj.estimated_scene_count})"
     )
 
+    # ── Step 1.5: Concept Decomposition & Allocation (Phase 6) ──────────────────
+    from services.concept_decomposer import (
+        generate_concept_graph,
+        allocate_scene_concepts,
+        validate_concept_diversity,
+        validate_coverage,
+    )
+
+    # 1. Generate Concept Graph
+    concept_graph = await generate_concept_graph(req.topic, lesson_plan_obj)
+    save_json(project_id, "concept_graph.json", concept_graph.model_dump())
+
+    # 2. Perform Scene Concept Allocation with validation and re-try limits
+    num_scenes = lesson_plan_obj.estimated_scene_count
+    allocation = allocate_scene_concepts(concept_graph, lesson_plan_obj, num_scenes)
+
+    diversity = {}
+    coverage = {}
+
+    for attempt in range(3):
+        diversity = validate_concept_diversity(allocation, num_scenes)
+        coverage = validate_coverage(concept_graph, lesson_plan_obj, allocation)
+
+        is_diverse = diversity["overlap_ratio"] <= 0.60
+        is_novel = diversity["visual_novelty_score"] >= 0.70
+        is_covered = coverage["coverage_rate"] >= 0.90
+        is_type_balanced = coverage["concept_type_balance"] >= 0.80
+        is_reuse_balanced = coverage["concept_reuse_balance"] >= 0.70
+
+        if is_diverse and is_novel and is_covered and is_type_balanced and is_reuse_balanced:
+            logger.info(f"[DECOMPOSER] Concept allocation validation passed on attempt {attempt + 1}.")
+            break
+
+        logger.warning(
+            f"[DECOMPOSER] Validation failed on attempt {attempt + 1}. "
+            f"Overlap: {diversity['overlap_ratio']:.2f} | Novelty: {diversity['visual_novelty_score']:.2f} | "
+            f"Coverage: {coverage['coverage_rate']:.2f}. Forcing reallocation."
+        )
+        allocation = allocate_scene_concepts(concept_graph, lesson_plan_obj, num_scenes, force_reallocate=True)
+
+    # Re-evaluate final stats
+    diversity = validate_concept_diversity(allocation, num_scenes)
+    coverage = validate_coverage(concept_graph, lesson_plan_obj, allocation)
+
+    # Save canonical scene_concept_allocation.json
+    save_json(project_id, "scene_concept_allocation.json", allocation)
+
+    # Save diagnostics audit logs concept_graph_audit.json
+    audit_data = {
+        "metrics": {
+            "total_concepts": len(concept_graph.concepts),
+            "unique_concepts": len(set(c.concept_id for c in concept_graph.concepts)),
+            "scene_diversity_score": round(diversity["diversity_score"], 2),
+            "overlap_ratio": round(diversity["overlap_ratio"], 2),
+            "visual_novelty_score": round(diversity["visual_novelty_score"], 2),
+            "average_visual_concepts_per_scene": round(diversity["average_concepts_per_scene"], 2),
+            "coverage_rate": round(coverage["coverage_rate"], 2),
+            "concept_reuse_balance": round(coverage["concept_reuse_balance"], 2),
+            "concept_type_balance": round(coverage["concept_type_balance"], 2),
+            "objectives_covered_pct": round(coverage["objectives_covered_pct"], 2),
+            "core_concepts_covered_pct": round(coverage["core_concepts_covered_pct"], 2),
+        },
+        "allocation": allocation,
+        "validation_passed": (
+            diversity["overlap_ratio"] <= 0.60
+            and diversity["visual_novelty_score"] >= 0.70
+            and coverage["coverage_rate"] >= 0.90
+        )
+    }
+    save_json(project_id, "concept_graph_audit.json", audit_data)
+
     # ── Step 2: Educational Script Generation ────────────────────────────────
     script_data = await llm_service.generate_script(
         req.topic, req.duration, req.style, req.language,
         educational_level=educational_level,
         lesson_plan=lesson_plan_dict,
+        concept_graph=concept_graph.model_dump(),
+        assigned_scene_concepts=allocation,
     )
 
     # ── Step 3: Narration Quality Review (with dynamic thresholds & cost controls) ──

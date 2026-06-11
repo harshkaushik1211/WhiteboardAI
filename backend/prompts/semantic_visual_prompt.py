@@ -59,6 +59,7 @@ def build_semantic_visual_prompt(
     template_hints: dict,
     asset_catalog: list = None,
     scene_type: str = None,  # Educational scene role from SceneSchema.scene_type
+    assigned_concepts: list = None,  # Phase 6: assigned concepts for this scene
 ) -> str:
     preferred = memory_hints.get("preferred_visuals", [])
     default_layout = memory_hints.get("preferred_layout", template_hints.get("default_layout", "flow_diagram"))
@@ -81,8 +82,12 @@ def build_semantic_visual_prompt(
     if scene_type:
         scene_type_block = f"\nScene type: {scene_type} — {scene_type_guidance}"
 
+    assigned_concepts_block = ""
+    if assigned_concepts:
+        assigned_concepts_block = f"\nCRITICAL: You MUST plan visuals using the following assigned concepts: {', '.join(assigned_concepts)}. Focus the visual representation on these elements. Do NOT introduce concepts assigned to other scenes."
+
     return f"""Plan semantic visuals for scene {scene_id}.
-{restrict}
+{restrict}{assigned_concepts_block}
 Topic: {topic}
 Narration: {narration}
 Visual description: {visual_description}

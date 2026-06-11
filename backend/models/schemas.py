@@ -185,6 +185,38 @@ class RetrievedAsset(BaseModel):
     rejection_reason: Optional[str] = None
 
 
+class ResolutionResult(BaseModel):
+    original_concept: str
+    canonical_concept: str
+    confidence: float
+    resolution_type: str
+    lesson_domain: str
+
+
+class EducationalConcept(BaseModel):
+    concept_id: str
+    name: str
+    importance: float
+    visual_priority: float
+    concept_type: str
+    relationships: List[str] = Field(default_factory=list)
+    prerequisite_concepts: List[str] = Field(default_factory=list)
+
+
+class ConceptRelationship(BaseModel):
+    from_concept: str
+    to_concept: str
+    relationship_type: str
+
+
+class ConceptGraph(BaseModel):
+    topic: str
+    domain: str
+    concepts: List[EducationalConcept] = Field(default_factory=list)
+    edges: List[ConceptRelationship] = Field(default_factory=list)
+
+
+
 class VisualAuditEntry(BaseModel):
     scene_id: int
     concept: str

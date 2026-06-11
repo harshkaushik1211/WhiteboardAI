@@ -259,6 +259,8 @@ def build_script_prompt(
     memory_hints: dict = None,
     educational_level: str = "high_school",
     lesson_plan: dict = None,
+    concept_graph: dict = None,
+    assigned_scene_concepts: dict = None,
 ) -> str:
     """Build the full educational script generation user prompt.
 
@@ -270,6 +272,7 @@ def build_script_prompt(
     - Added scene_type and transition_phrase to required JSON output
     - Added quality_feedback injection for rewrite passes
     - Narration length is driven by teaching need, not word budgets
+    - Phase 6: Injects concept graph and assigned scene concepts to guide scene topics.
 
     Args:
         topic: Subject to teach.
@@ -279,6 +282,8 @@ def build_script_prompt(
         memory_hints: Topic-specific semantic memory hints.
         educational_level: Target audience level.
         lesson_plan: Pre-generated lesson plan dict from the lesson planner.
+        concept_graph: Concept graph dictionary.
+        assigned_scene_concepts: Mapping of scene index (str or int) to list of assigned concepts.
 
     Returns:
         User-facing prompt string for the script generation LLM call.
@@ -369,8 +374,18 @@ def build_script_prompt(
                 lesson_block += f"  ⚠ {issue}\n"
             lesson_block += "The previous script was rejected for the above reasons. Fix all of them.\n"
 
+    # ── Concept graph and allocation integration block ───────────────────────
+    allocation_block = ""
+    if assigned_scene_concepts:
+        allocation_block += "\nCRITICAL: CONCEPTS ASSIGNED TO EACH SCENE (You MUST write the scene narration and whiteboard visual description focusing primarily on explaining/illustrating these specific concepts):\n"
+        for s_idx in range(1, scene_count + 1):
+            s_key = str(s_idx)
+            concepts_list = assigned_scene_concepts.get(s_key) or assigned_scene_concepts.get(s_idx) or []
+            allocation_block += f"  Scene {s_idx}: {', '.join(concepts_list) if concepts_list else 'general discussion'}\n"
+        allocation_block += "Do NOT explain all concepts in every scene. Establish a logical, progressive visual story utilizing the assigned list.\n"
+
     return f"""You are creating an educational whiteboard video script. Teach this topic as an expert teacher would.
-{guidance_block}{lesson_block}
+{guidance_block}{lesson_block}{allocation_block}
 ━━━ PARAMETERS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Topic:              {topic}
 Educational level:  {educational_level}

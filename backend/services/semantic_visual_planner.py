@@ -142,6 +142,11 @@ async def plan_semantic_scenes(
     script: ScriptSchema,
     topic: str,
 ) -> List[SemanticScenePlan]:
+    from utils.file_manager import load_json
+    
+    # Phase 6: Load the canonical concept allocation
+    allocation = load_json(project_id, "scene_concept_allocation.json") or {}
+
     memory = _load_semantic_memory()
     memory_hints = _resolve_memory_entry(topic, memory)
     template = _load_template(topic, memory)
@@ -152,6 +157,9 @@ async def plan_semantic_scenes(
         hint = _hint_for_scene(template, index)
         if template_only and hint:
             return _plan_from_template_hint(scene, topic, hint, template)
+
+        # Retrieve assigned concepts for this scene ID
+        assigned_concepts = allocation.get(str(scene.scene_id)) or allocation.get(scene.scene_id) or []
 
         prompt = build_semantic_visual_prompt(
             scene.scene_id,
@@ -164,6 +172,7 @@ async def plan_semantic_scenes(
             template,
             catalog,
             scene_type=scene.scene_type,  # Forward educational scene role for intent-aware layout
+            assigned_concepts=assigned_concepts,
         )
         data = await llm_service._chat_json(SEMANTIC_VISUAL_SYSTEM, prompt)
         try:

@@ -10,6 +10,7 @@ from models.schemas import (
     ScenePlanSchema,
     SemanticScenePlan,
     VisualAuditEntry,
+    ResolutionResult,
 )
 from services.layout_engine import layout_engine
 from services.semantic_visual_planner import _load_semantic_memory, _resolve_memory_entry
@@ -58,10 +59,19 @@ async def build_scene_plans_from_semantic(
     scene_plans: List[ScenePlanSchema] = []
     audit: List[VisualAuditEntry] = []
 
+    resolution_audit_entries: List[ResolutionResult] = []
+
     ensure_project_dirs(project_id)
 
     for semantic in semantic_plans:
         from services.action_mapper import map_action_to_motion
+        from services.concept_resolver import resolve_concept
+
+        for rv in semantic.required_visuals:
+            result = resolve_concept(rv.concept, lesson_domain)
+            resolution_audit_entries.append(result)
+            rv.concept = result.canonical_concept
+
         rv_map = {rv.concept.lower(): rv for rv in semantic.required_visuals}
 
         retrieved = svg_retriever.retrieve_assets(
@@ -185,9 +195,35 @@ async def build_scene_plans_from_semantic(
         "action_execution_stats": scene_action_stats
     }
 
+    # Calculate concept resolution statistics
+    total_resolutions = len(resolution_audit_entries)
+    resolved_count = sum(1 for r in resolution_audit_entries if r.resolution_type != "fallback")
+    resolution_rate = resolved_count / total_resolutions if total_resolutions > 0 else 1.0
+
+    match_types = {
+        "exact_match": 0,
+        "alias_match": 0,
+        "ontology_match": 0,
+        "semantic_match": 0,
+        "fallback": 0
+    }
+    for r in resolution_audit_entries:
+        match_types[r.resolution_type] = match_types.get(r.resolution_type, 0) + 1
+
+    concept_resolution_audit_data = {
+        "metrics": {
+            "total_concepts": total_resolutions,
+            "resolved_concepts": resolved_count,
+            "resolution_rate": round(resolution_rate, 2),
+            "match_types": match_types
+        },
+        "resolutions": [r.model_dump() for r in resolution_audit_entries]
+    }
+
     save_json(project_id, "scene_plans.json", [p.model_dump() for p in scene_plans])
     save_json(project_id, "visual_audit.json", [a.model_dump() for a in audit])
     save_json(project_id, "retrieval_audit.json", retrieval_audit_data)
+    save_json(project_id, "concept_resolution_audit.json", concept_resolution_audit_data)
     return scene_plans, audit
 
 

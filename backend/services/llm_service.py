@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from openai import AsyncOpenAI
 
@@ -60,6 +60,8 @@ class LLMService:
         language: str,
         educational_level: str = "high_school",
         lesson_plan: Optional[Dict[str, Any]] = None,
+        concept_graph: Optional[Dict[str, Any]] = None,
+        assigned_scene_concepts: Optional[Dict[str, List[str]]] = None,
     ) -> Dict[str, Any]:
         """Generate an educational whiteboard script.
 
@@ -70,7 +72,8 @@ class LLMService:
             language: Narration language.
             educational_level: Audience level — adapts vocabulary and depth.
             lesson_plan: Pre-generated lesson plan dict from lesson_planner service.
-                         If provided, guides scene count, sequence, and examples.
+            concept_graph: Pre-generated ConceptGraph dict (Phase 6).
+            assigned_scene_concepts: Concept allocation dict mapping scene ID (str) to concepts.
 
         Returns:
             Raw script dict with title, total_duration, and scenes list.
@@ -84,6 +87,8 @@ class LLMService:
             memory_hints=memory_hints,
             educational_level=educational_level,
             lesson_plan=lesson_plan,
+            concept_graph=concept_graph,
+            assigned_scene_concepts=assigned_scene_concepts,
         )
         return await self._chat_json(SCRIPT_SYSTEM_PROMPT, prompt)
 
