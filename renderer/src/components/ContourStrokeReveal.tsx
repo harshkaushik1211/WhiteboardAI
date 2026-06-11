@@ -1,9 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { continueRender, delayRender, useCurrentFrame } from "remotion";
-import { getStrokeProgress } from "../animations/strokeReveal";
-import type { StrokeData } from "../types/stroke";
+import {
+  getDashOffset,
+  getStrokeProgress,
+  isStrokeComplete,
+} from "../animations/strokeReveal";
+import type { ContourPath, StrokeData } from "../types/stroke";
 import { resolveImageSrc } from "../utils/resolveImageSrc";
-import { computeSketchLayout } from "../utils/sketchLayout";
 
 interface ContourStrokeRevealProps {
   src: string;
@@ -18,17 +21,47 @@ interface ContourStrokeRevealProps {
   color?: string;
 }
 
+interface PathDrawState {
+  path: ContourPath;
+  status: "pending" | "drawing" | "done";
+  localProgress: number;
+}
+
+/** Length-weighted sequential stroke reveal — one line after another. */
+function computePathDrawStates(
+  paths: ContourPath[],
+  progress: number,
+  strokePhaseEnd: number
+): PathDrawState[] {
+  if (!paths.length) return [];
+
+  const totalLen = paths.reduce((s, p) => s + Math.max(p.length || 80, 8), 0);
+  const strokeT = Math.min(1, progress / strokePhaseEnd);
+  const drawnLen = strokeT * totalLen;
+
+  let acc = 0;
+  return paths.map((path) => {
+    const len = Math.max(path.length || 80, 8);
+    if (acc + len <= drawnLen) {
+      acc += len;
+      return { path, status: "done" as const, localProgress: 1 };
+    }
+    if (acc < drawnLen) {
+      const localProgress = (drawnLen - acc) / len;
+      acc += len;
+      return { path, status: "drawing" as const, localProgress };
+    }
+    return { path, status: "pending" as const, localProgress: 0 };
+  });
+}
+
 /**
- * Whiteboard "ink sweep" reveal:
- *   Phase 1 (0 → 70%): ink image sweeps in top-to-bottom with a soft gradient brush edge
- *   Phase 2 (65% → 100%): color image fades in over the ink
- *
- * This replaces the old SVG-contour-path approach which produced tiny invisible
- * fragments and bbox-rectangle artifacts.
+ * Line-by-line whiteboard stroke reveal:
+ *   Phase 1: SVG paths drawn sequentially with dash animation (brush-like)
+ *   Phase 2: color image fades in when strokes complete
  */
 export const ContourStrokeReveal: React.FC<ContourStrokeRevealProps> = ({
   src,
-  inkSrc,
   strokeData,
   startFrame,
   endFrame,
@@ -36,144 +69,123 @@ export const ContourStrokeReveal: React.FC<ContourStrokeRevealProps> = ({
   y,
   width,
   height,
+  color = "#1a1a2e",
 }) => {
   const frame = useCurrentFrame();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const colorRef = useRef<HTMLImageElement | null>(null);
-  const inkRef = useRef<HTMLImageElement | null>(null);
+  const [colorReady, setColorReady] = useState(false);
   const [handle] = useState(() =>
-    delayRender("Loading images for ink sweep reveal")
+    delayRender("Loading sketch for line stroke reveal")
   );
 
   const progress = getStrokeProgress(frame, startFrame, endFrame);
-  const layout = computeSketchLayout(width, height, strokeData);
-  const { scale, offsetX, offsetY, drawW, drawH } = layout;
-  const sW = strokeData.width;
-  const sH = strokeData.height;
+  const paths = strokeData.paths ?? [];
+  const sw = strokeData.width;
+  const sh = strokeData.height;
 
-  // Timing constants
-  const INK_SWEEP_END = 0.72;    // ink sweep occupies first 72% of animation
-  const COLOR_FADE_IN = 0.65;    // color starts fading in while ink is still sweeping
-  const BRUSH_EDGE_PX = 80;      // soft gradient pixels at the sweep boundary
+  const STROKE_PHASE_END = 0.9;
+  const COLOR_FADE_START = 0.88;
 
-  const paint = useCallback(() => {
-    const canvas = canvasRef.current;
-    const colorImg = colorRef.current;
-    if (!canvas || !colorImg?.complete) return;
+  const pathStates = useMemo(
+    () => computePathDrawStates(paths, progress, STROKE_PHASE_END),
+    [paths, progress]
+  );
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  const colorAlpha =
+    progress < COLOR_FADE_START
+      ? 0
+      : Math.min(1, (progress - COLOR_FADE_START) / (1 - COLOR_FADE_START));
 
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, width, height);
-
-    const inkImg = inkRef.current;
-
-    // ── Phase 1: ink sweep ────────────────────────────────────────────────────
-    const inkProgress = Math.min(1, progress / INK_SWEEP_END);
-    // revealY is in stroke-data space (0..sH); at inkProgress=1 whole image visible
-    const revealYInk = inkProgress * sH;
-
-    const drawSource = (inkImg?.complete ? inkImg : null) ?? colorImg;
-    if (revealYInk > 0) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(offsetX, offsetY, drawW, revealYInk * scale);
-      ctx.clip();
-      ctx.drawImage(drawSource, 0, 0, sW, sH, offsetX, offsetY, drawW, drawH);
-      ctx.restore();
-
-      // Soft gradient brush edge at the sweep boundary
-      if (inkProgress < 1) {
-        const edgeCanvasY = offsetY + revealYInk * scale;
-        const edgeH = BRUSH_EDGE_PX * scale;
-        const grad = ctx.createLinearGradient(
-          0, edgeCanvasY - edgeH,
-          0, edgeCanvasY + 4
-        );
-        grad.addColorStop(0, "rgba(255,255,255,0)");
-        grad.addColorStop(1, "rgba(255,255,255,1)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, edgeCanvasY - edgeH, width, edgeH + 4);
-      }
-    }
-
-    // ── Phase 2: color fade-in ────────────────────────────────────────────────
-    const colorAlpha =
-      progress < COLOR_FADE_IN
-        ? 0
-        : Math.min(1, (progress - COLOR_FADE_IN) / (1 - COLOR_FADE_IN));
-
-    if (colorAlpha > 0) {
-      ctx.globalAlpha = colorAlpha;
-      ctx.drawImage(colorImg, 0, 0, sW, sH, offsetX, offsetY, drawW, drawH);
-      ctx.globalAlpha = 1;
-    }
-  }, [
-    progress,
-    strokeData,
-    width,
-    height,
-    scale,
-    offsetX,
-    offsetY,
-    drawW,
-    drawH,
-    sW,
-    sH,
-  ]);
+  const showFullColor = isStrokeComplete(progress);
 
   useEffect(() => {
-    paint();
-  }, [paint, frame]);
-
-  useEffect(() => {
-    let pending = 2;
-    const done = () => {
-      pending -= 1;
-      if (pending <= 0) {
-        paint();
-        continueRender(handle);
-      }
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = resolveImageSrc(src);
+    img.onload = () => {
+      setColorReady(true);
+      continueRender(handle);
     };
+    img.onerror = () => continueRender(handle);
+  }, [src, handle]);
 
-    const color = new Image();
-    color.crossOrigin = "anonymous";
-    color.src = resolveImageSrc(src);
-    color.onload = () => { colorRef.current = color; done(); };
-    color.onerror = done;
-
-    // inkSrc may be undefined if the ink image wasn't generated; fall back to color.
-    const inkSrcResolved = inkSrc ? resolveImageSrc(inkSrc) : null;
-    if (inkSrcResolved) {
-      const ink = new Image();
-      ink.crossOrigin = "anonymous";
-      ink.src = inkSrcResolved;
-      ink.onload = () => { inkRef.current = ink; done(); };
-      ink.onerror = done;
-    } else {
-      done(); // no ink image — proceed with color only
-    }
-
-    return () => {
-      colorRef.current = null;
-      inkRef.current = null;
-    };
-  }, [src, inkSrc, handle, paint]);
+  if (!paths.length) {
+    return null;
+  }
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={Math.round(width)}
-      height={Math.round(height)}
+    <div
       style={{
         position: "absolute",
         left: x,
         top: y,
         width,
         height,
+        background: "#ffffff",
       }}
-    />
+    >
+      {/* Stroke layer — viewBox matches stroke-data coords */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${sw} ${sh}`}
+        width={width}
+        height={height}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ position: "absolute", inset: 0, overflow: "visible" }}
+      >
+        {pathStates.map(({ path, status, localProgress }, i) => {
+          if (status === "pending") return null;
+
+          const len = Math.max(path.length || 80, 8);
+
+          if (status === "done") {
+            return (
+              <path
+                key={i}
+                d={path.d}
+                stroke={color}
+                strokeWidth={2.8}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          }
+
+          const dashOffset = getDashOffset(len, localProgress);
+          return (
+            <path
+              key={i}
+              d={path.d}
+              stroke={color}
+              strokeWidth={2.8}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              strokeDasharray={`${len} ${len}`}
+              strokeDashoffset={dashOffset}
+            />
+          );
+        })}
+      </svg>
+
+      {/* Color image fades in after strokes finish */}
+      {colorReady && colorAlpha > 0 && (
+        <img
+          src={resolveImageSrc(src)}
+          alt=""
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            opacity: showFullColor ? 1 : colorAlpha,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+    </div>
   );
 };

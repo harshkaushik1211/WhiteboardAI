@@ -2,7 +2,11 @@
 import numpy as np
 import cv2
 
-from services.stroke.contour_to_svg import extract_svg_paths_from_crop
+from services.stroke.contour_to_svg import (
+    extract_svg_paths_from_crop,
+    order_paths_for_drawing,
+    path_start,
+)
 from services.stroke.vision_bbox_detector import _clamp_bbox_pixels
 
 
@@ -19,3 +23,12 @@ def test_extract_paths_from_synthetic_crop():
     assert len(paths) >= 1
     assert "d" in paths[0]
     assert paths[0]["length"] > 0
+
+
+def test_order_paths_for_drawing():
+    paths = [
+        {"d": "M10,10 L50,10", "length": 40},
+        {"d": "M50,10 L50,50", "length": 40},
+    ]
+    ordered = order_paths_for_drawing(paths)
+    assert path_start(ordered[0]["d"]) == (10.0, 10.0)
