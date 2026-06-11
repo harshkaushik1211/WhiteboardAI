@@ -39,13 +39,6 @@ export async function generateScenes(projectId: string) {
   );
 }
 
-export async function generateSvg(projectId: string) {
-  return fetchApi<{ project_id: string; svg_files: string[]; scene_plans: ScenePlan[] }>(
-    "/generate-svg",
-    { method: "POST", body: JSON.stringify({ project_id: projectId }) }
-  );
-}
-
 export async function generateVoice(projectId: string) {
   return fetchApi<{ project_id: string; voice_files: string[] }>(
     "/generate-voice",
@@ -119,6 +112,7 @@ export function connectRenderProgress(
   onError?: (err: Event) => void
 ): () => void {
   const ws = new WebSocket(`${WS_BASE}/ws/${jobId}`);
+  let disposed = false;
 
   ws.onmessage = (event) => {
     try {
@@ -131,9 +125,20 @@ export function connectRenderProgress(
     }
   };
 
-  ws.onerror = (e) => onError?.(e);
+  ws.onerror = (e) => {
+    if (!disposed) onError?.(e);
+  };
 
-  return () => ws.close();
+  return () => {
+    disposed = true;
+    // React Strict Mode unmounts before CONNECTING finishes; closing early
+    // triggers a benign browser warning. Defer close until open when needed.
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.close();
+    } else if (ws.readyState === WebSocket.CONNECTING) {
+      ws.addEventListener("open", () => ws.close(), { once: true });
+    }
+  };
 }
 
 export interface F5StatusResponse {

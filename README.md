@@ -4,12 +4,12 @@ Generate polished animated educational whiteboard videos locally from a single t
 
 ## Features
 
-- Topic → Script → Semantic visual plan → SVG asset retrieval → Layout → Voice → Remotion → MP4
-- OpenAI GPT-4o for script and semantic visual planning
-- Local curated SVG asset library (biology, physics, CS, etc.) — no random primitives
+- Topic → Script → AI whiteboard image per scene → Stroke reveal → Voice → Remotion → MP4
+- OpenAI GPT-4o for script and lesson planning
+- `gpt-image-1-mini` generates one whiteboard PNG per scene
+- Enhanced stroke reveal: OpenAI Vision bboxes → contour → SVG paths (storyboard-ai style, no SAM3)
 - Edge-TTS for narration (free, local)
-- SVG stroke-reveal animations (Golpo / VideoScribe style)
-- Remotion + FFmpeg for GPU-accelerated local rendering
+- Remotion + FFmpeg for local rendering
 - Next.js 14 UI with preview and export
 
 ## Prerequisites
@@ -63,113 +63,58 @@ chmod +x scripts/*.sh
 ./scripts/start-frontend.sh  # terminal 2
 ```
 
-## Full Pipeline (step-by-step)
+## Pipeline
 
-From the **Project Viewer** (`/project/{id}`) you can run each stage manually:
-
-1. **Scenes** — OpenAI semantic visual plan (concepts + layout, not geometry)
-2. **SVGs** — Retrieved from local asset library and composed on canvas
-3. **Voice** — Edge-TTS narration per scene
-4. **Render Video** — Remotion render + FFmpeg encode
+1. User enters topic + duration + voice style
+2. OpenAI generates educational script with scenes
+3. `gpt-image-1-mini` draws one whiteboard PNG per scene
+4. OpenAI Vision bboxes → edge detection → contour SVG paths per object
+5. Edge-TTS generates narration per scene
+6. Timeline sync builds `render_manifest.json`
+7. Remotion renders 1080p video with stroke animation
+8. FFmpeg merges audio and exports MP4
 
 **Generate Full Video** on the home page runs the entire pipeline in one click.
 
-## Visual modes
+From the **Project Viewer** (`/project/{id}`) you can run each stage manually:
 
-On the home page, choose **Visual source**:
+1. **Images** — Generate scene PNGs + stroke data
+2. **Voice** — Edge-TTS narration per scene
+3. **Render Video** — Remotion render + FFmpeg encode
 
-| Mode | How visuals are built | Animation |
-|------|----------------------|-----------|
-| **Asset library** (default) | Match narration to curated SVGs under `assets/` | Per-icon stroke reveal |
-| **AI line art** | `gpt-4o-mini` draws 2–3 outline SVG layers per scene | Staggered stroke reveal per layer |
-| **AI image** | `gpt-image-1-mini` draws one PNG per scene (like [storyboard-ai](https://github.com/yogendra-yatnalkar/storyboard-ai)) | Left-to-right wipe reveal (no SAM) |
+## AI image pipeline
 
-AI line art uses the **text** API (not DALL·E / `gpt-image-1-mini`). Each scene returns **2–3 layered SVGs** (e.g. box at rest → force arrow → box moved) drawn in sequence with staggered stroke reveal. Rough cost: ~$0.02–0.08 for an 8-scene / 60s video.
+Each scene:
+
+1. GPT writes an image prompt from narration + visual description
+2. `gpt-image-1-mini` generates a 1536×1024 whiteboard PNG
+3. OpenAI Vision returns object bounding boxes
+4. Each crop: Canny edges → contours → SVG paths
+5. Remotion animates paths object-by-object, then fills color
+
+```bash
+STROKE_BACKEND=vision_contour
+SEGMENTATION_VISION_MODEL=gpt-4o-mini
+```
 
 Env (optional in `.env`):
 
 ```bash
-OPENAI_LINE_ART_MODEL=gpt-4o-mini
 OPENAI_IMAGE_MODEL=gpt-image-1-mini
 OPENAI_IMAGE_QUALITY=low
 OPENAI_IMAGE_SIZE=1536x1024
-VISUAL_MODE_DEFAULT=library
+OPENAI_LINE_ART_MODEL=gpt-4o-mini   # used for image prompt writing
 ```
 
-### Example: Newton’s first law (AI line art)
-
-Topic: `Newton's laws`, visual source: **AI line art**, duration 60–90s.
-
-Scene 1 prompt intent (automatic from script narration):
-
-- Left: box on the ground, label “at rest”
-- Right: same box with arrow labeled “force”, box shifted
-- Outline only, navy stroke `#1a1a2e`, 1920×1080 whiteboard
-
-The model writes SVG paths per layer; the renderer draws layer 1, then layer 2, then layer 3 (files like `scene-1-layer-1.svg`), then narration plays.
-
-Audit file: `generated/projects/{id}/ai_sketch_audit.json`. Preview sketches on the project page.
-
-## Semantic SVG Asset Pipeline
-
-Educational visuals are **retrieved**, not procedurally drawn:
-
-1. LLM outputs `required_visuals` (e.g. lungs, mitochondria, oxygen) per scene
-2. [`svg_retriever`](backend/services/svg_retriever.py) matches concepts to [`assets/`](assets/)
-3. [`layout_engine`](backend/services/layout_engine.py) positions assets (flow, pipeline, anatomy layouts)
-4. Remotion animates real SVG paths with stroke reveal
-
-### Adding assets
-
-**From [SVG Repo](https://www.svgrepo.com/) (CC0 icons):**
-
-1. Open an icon on svgrepo.com and copy the URL (e.g. `https://www.svgrepo.com/svg/489281/api`).
-2. Download into the library:
-
-```bash
-python3 scripts/download_svgrepo.py \
-  --url "https://www.svgrepo.com/svg/489281/api" \
-  --concept lungs --category biology \
-  --normalize --reindex
-```
-
-Or batch via `assets/svgrepo_manifest.json` (see `assets/svgrepo_manifest.example.json`):
-
-```bash
-python3 scripts/download_svgrepo.py --manifest assets/svgrepo_manifest.json --normalize --reindex
-```
-
-API: `POST /assets/svgrepo/download` with JSON `{"url": "...", "concept": "lungs", "category": "biology"}`.
-
-**Curated (generated locally, no download):**
-
-```bash
-python3 scripts/generate_curated_assets.py
-python3 scripts/normalize_svg_assets.py
-curl -X POST http://localhost:8000/assets/reindex
-```
-
-Topic hints live in [`assets/semantic_memory.json`](assets/semantic_memory.json). Scene templates in [`templates/`](templates/).
-
-### Photosynthesis video (single diagram)
-
-Uses one full diagram SVG: [`assets/biology/photosynthesis-diagram.svg`](assets/biology/photosynthesis-diagram.svg) (Wikipedia-style illustration; colors preserved).
-
-You can also keep your file as `assets/960px-Photosynthesis_en.svg.svg` — the indexer picks up any `*photosynthesis-diagram*.svg` under `assets/`.
-
-Generate with topic **`photosynthesis`**, duration **90–120 seconds** (8 scenes). The video keeps the same diagram on screen, pans/zooms to each labeled part (light, CO₂, water, oxygen, glucose), with static scene headlines and narration.
-
-Config: [`assets/semantic_memory.json`](assets/semantic_memory.json) + [`templates/biology/photosynthesis.json`](templates/biology/photosynthesis.json).
+Audit file: `generated/projects/{id}/ai_image_audit.json`. Preview sketches on the project page.
 
 ## Project Structure
 
 ```
-animate_whiteboard/
+WhiteboardAI/
 ├── frontend/          # Next.js 14 UI
 ├── backend/           # FastAPI pipeline
 ├── renderer/          # Remotion compositions
-├── assets/            # Curated SVG library + index
-├── templates/         # Topic scene templates
 └── generated/         # Per-project outputs
 ```
 
@@ -178,29 +123,18 @@ animate_whiteboard/
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/generate-script` | Generate educational script |
-| POST | `/generate-scenes` | Plan visual elements per scene |
-| POST | `/generate-svg` | Generate SVG assets |
+| POST | `/generate-scenes` | Generate scene PNGs + stroke data |
 | POST | `/generate-voice` | Edge-TTS narration |
 | POST | `/render-video` | Full render pipeline |
 | GET | `/project/{id}` | Project status and artifacts |
 | WS | `/ws/{job_id}` | Render progress stream |
-
-## Pipeline
-
-1. User enters topic + duration + voice style
-2. OpenAI generates script JSON with scenes
-3. Scene planner produces diagram elements
-4. SVG engine creates hand-drawn assets
-5. Edge-TTS generates narration + timestamps
-6. Timeline sync builds `render_manifest.json`
-7. Remotion renders 1080p video
-8. FFmpeg merges audio and exports MP4
 
 ## Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OPENAI_MODEL` | `gpt-4o` | OpenAI model for script/scenes |
+| `OPENAI_IMAGE_MODEL` | `gpt-image-1-mini` | Image model per scene |
 | `FFMPEG_PATH` | system `ffmpeg` | FFmpeg binary path |
 | `REMOTION_CONCURRENCY` | `4` | Parallel render threads |
 

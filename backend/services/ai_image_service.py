@@ -47,7 +47,7 @@ def _headline_from_narration(narration: str, scene_id: int) -> str:
     return " ".join(words[:6])[:48] or f"Scene {scene_id}"
 
 
-async def generate_scene_image_for_project(
+async def generate_scene_png_for_project(
     project_id: str,
     scene_id: int,
     topic: str,
@@ -55,8 +55,8 @@ async def generate_scene_image_for_project(
     visual_description: str,
     keywords: list,
     prior_headline: str = "",
-) -> Tuple[str, str, str, str, str]:
-    """Returns (headline, image_prompt, rel_path, stroke_rel_path, model_name)."""
+) -> Tuple[str, str, str, str]:
+    """Generate PNG only. Returns (headline, image_prompt, rel_path, model_name)."""
     image_prompt = await _build_image_prompt(
         scene_id, topic, narration, visual_description, keywords, prior_headline
     )
@@ -76,6 +76,36 @@ async def generate_scene_image_for_project(
     png_bytes = base64.b64decode(response.data[0].b64_json)
     element_id = f"scene-{scene_id}-sketch"
     rel = save_png_to_project(project_id, element_id, png_bytes)
-    stroke_rel = extract_strokes_for_project_image(project_id, rel)
     headline = _headline_from_narration(narration, scene_id)
-    return headline, image_prompt, rel, stroke_rel, settings.openai_image_model
+    return headline, image_prompt, rel, settings.openai_image_model
+
+
+async def generate_scene_image_for_project(
+    project_id: str,
+    scene_id: int,
+    topic: str,
+    narration: str,
+    visual_description: str,
+    keywords: list,
+    prior_headline: str = "",
+) -> Tuple[str, str, str, str, str]:
+    """Returns (headline, image_prompt, rel_path, stroke_rel_path, model_name)."""
+    import asyncio
+
+    headline, image_prompt, rel, model = await generate_scene_png_for_project(
+        project_id,
+        scene_id,
+        topic,
+        narration,
+        visual_description,
+        keywords,
+        prior_headline,
+    )
+    stroke_rel = await asyncio.to_thread(
+        extract_strokes_for_project_image,
+        project_id,
+        rel,
+        keywords,
+        visual_description,
+    )
+    return headline, image_prompt, rel, stroke_rel, model

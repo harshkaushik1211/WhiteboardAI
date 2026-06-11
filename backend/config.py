@@ -18,7 +18,19 @@ class Settings(BaseSettings):
     png_stroke_height: int = 1080
     png_stroke_split_len: int = 10
     png_stroke_min_area: int = 120
-    visual_mode_default: str = "library"
+
+    # Enhanced stroke: vision bboxes → contour → SVG paths
+    stroke_backend: str = "vision_contour"  # vision_contour | opencv
+    segmentation_vision_model: str = "gpt-4o-mini"
+    vision_max_objects: int = 5
+    vision_bbox_padding: float = 0.08
+    contour_canny_low: int = 40
+    contour_canny_high: int = 120
+    contour_min_area: int = 25
+    contour_approx_epsilon: float = 0.004
+    vision_image_max_side: int = 768  # smaller payload for vision bbox API
+    scene_image_concurrency: int = 3  # parallel OpenAI image calls per project
+
     port: int = 8000
     backend_url: str = "http://localhost:8000"
     frontend_url: str = "http://localhost:3000"

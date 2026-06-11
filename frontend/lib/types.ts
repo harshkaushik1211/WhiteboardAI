@@ -72,9 +72,13 @@ export interface AiImageAuditEntry {
   image_prompt: string;
   model: string;
   visual_mode: string;
+  stroke_mode?: string;
+  segmentation_backend?: string;
+  object_labels?: string[];
+  path_count?: number;
+  object_count?: number;
 }
 
-export type VisualMode = "library" | "ai_line_art" | "ai_image";
 export type VoiceProvider = "edge" | "f5tts";
 
 export type AvatarProvider = "liveportrait" | "musetalk" | "sadtalker" | null;
@@ -85,7 +89,6 @@ export interface GenerateConfig {
   style: string;
   voice: string;
   language: string;
-  visual_mode?: VisualMode;
   voice_provider?: VoiceProvider;
   avatar_provider?: AvatarProvider;
 }

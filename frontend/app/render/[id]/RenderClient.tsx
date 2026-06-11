@@ -5,8 +5,23 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ProgressTracker } from "@/components/ProgressTracker";
 import { VideoPreview } from "@/components/VideoPreview";
-import { connectRenderProgress, getProject, API_BASE } from "@/lib/api";
+import {
+  connectRenderProgress,
+  getPipelineStatus,
+  getProject,
+  API_BASE,
+} from "@/lib/api";
 import type { JobUpdate } from "@/lib/types";
+
+const STATUS_PROGRESS: Record<string, number> = {
+  script: 15,
+  scenes: 25,
+  svg: 40,
+  voice: 55,
+  timeline: 70,
+  render: 85,
+  complete: 100,
+};
 
 interface RenderClientProps {
   projectId: string;
@@ -21,21 +36,74 @@ export function RenderClient({ projectId, jobId }: RenderClientProps) {
   useEffect(() => {
     if (!jobId) return;
 
+    let wsGotUpdate = false;
+
+    const onComplete = () => {
+      getProject(projectId).then((p) => {
+        setTitle(p.script?.title || p.topic);
+        setVideoUrl(
+          p.video_url
+            ? `${API_BASE}${p.video_url}`
+            : `${API_BASE}/media/projects/${projectId}/videos/final_video.mp4`
+        );
+      });
+    };
+
     const cleanup = connectRenderProgress(jobId, (data) => {
+      wsGotUpdate = true;
       setJob(data);
-      if (data.step === "complete") {
-        getProject(projectId).then((p) => {
-          setTitle(p.script?.title || p.topic);
-          setVideoUrl(
-            p.video_url
-              ? `${API_BASE}${p.video_url}`
-              : `${API_BASE}/media/projects/${projectId}/videos/final_video.mp4`
-          );
-        });
+      if (data.step === "complete") onComplete();
+      if (data.step === "error") {
+        setJob((prev) => prev ?? { ...data });
       }
     });
 
-    return cleanup;
+    // Fallback when the in-memory job is lost (e.g. backend reload) or WS races.
+    const poll = window.setInterval(async () => {
+      try {
+        const pipeline = await getPipelineStatus(projectId);
+        if (pipeline.render.status === "complete") {
+          setJob({
+            job_id: jobId,
+            project_id: projectId,
+            step: "complete",
+            progress: 100,
+            message: "Video ready",
+          });
+          onComplete();
+          return;
+        }
+        if (pipeline.render.status === "failed") {
+          setJob({
+            job_id: jobId,
+            project_id: projectId,
+            step: "error",
+            progress: 0,
+            message: "Render failed",
+            error: "Pipeline did not complete. Retry from the project page.",
+          });
+          return;
+        }
+        if (!wsGotUpdate) {
+          const p = await getProject(projectId);
+          const progress = STATUS_PROGRESS[p.status] ?? 10;
+          setJob({
+            job_id: jobId,
+            project_id: projectId,
+            step: p.status,
+            progress,
+            message: `Pipeline running (${p.status})…`,
+          });
+        }
+      } catch {
+        // ignore transient poll errors
+      }
+    }, 4000);
+
+    return () => {
+      cleanup();
+      window.clearInterval(poll);
+    };
   }, [jobId, projectId]);
 
   useEffect(() => {

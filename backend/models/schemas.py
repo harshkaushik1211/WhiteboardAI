@@ -26,7 +26,6 @@ class GenerateScriptRequest(BaseModel):
     style: str = "whiteboard"
     voice: str = "male"
     language: str = "english"
-    visual_mode: str = "library"          # library | ai_line_art | ai_image
     voice_provider: str = "edge"          # edge | f5tts
     avatar_provider: Optional[str] = None # future: liveportrait | musetalk | sadtalker
     # Educational level — adapts vocabulary, depth, analogy sophistication
