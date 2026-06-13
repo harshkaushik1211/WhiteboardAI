@@ -223,7 +223,7 @@ async def _extract_stroke_data_async(
         )
 
 
-def extract_stroke_data(
+async def extract_stroke_data(
     image_path: Path,
     output_path: Path | None = None,
     width: int | None = None,
@@ -240,39 +240,39 @@ def extract_stroke_data(
     split_len = split_len or settings.png_stroke_split_len
     del min_component_area, black_pixel_threshold, split_len
 
-    normalize_sketch_png(image_path)
+    await asyncio.to_thread(normalize_sketch_png, image_path)
 
-    data = _run_async(
-        _extract_stroke_data_async(
-            image_path,
-            width,
-            height,
-            object_hints,
-            visual_description,
-            debug_output_path,
-        )
+    data = await _extract_stroke_data_async(
+        image_path,
+        width,
+        height,
+        object_hints,
+        visual_description,
+        debug_output_path,
     )
 
-    img = cv2.imread(str(image_path))
-    if img is not None:
-        img = cv2.resize(img, (width, height))
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img_thresh = cv2.adaptiveThreshold(
-            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 10
-        )
-        from services.stroke.contour_to_svg import build_ink_image
+    def _postprocess_img():
+        img = cv2.imread(str(image_path))
+        if img is not None:
+            img = cv2.resize(img, (width, height))
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img_thresh = cv2.adaptiveThreshold(
+                gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 10
+            )
+            from services.stroke.contour_to_svg import build_ink_image
 
-        ink_bgr = build_ink_image(img_thresh)
-        rel_ink = ink_image_path_for_sketch(f"assets/{image_path.name}")
-        data["ink_image"] = rel_ink
+            ink_bgr = build_ink_image(img_thresh)
+            rel_ink = ink_image_path_for_sketch(f"assets/{image_path.name}")
+            data["ink_image"] = rel_ink
+            if output_path is not None:
+                ink_path = output_path.parent / f"{image_path.stem}-ink.png"
+                cv2.imwrite(str(ink_path), ink_bgr)
+
         if output_path is not None:
-            ink_path = output_path.parent / f"{image_path.stem}-ink.png"
-            cv2.imwrite(str(ink_path), ink_bgr)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(json.dumps(data), encoding="utf-8")
 
-    if output_path is not None:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(json.dumps(data), encoding="utf-8")
-
+    await asyncio.to_thread(_postprocess_img)
     return data
 
 
@@ -298,7 +298,7 @@ def normalize_sketch_png(image_path: Path) -> Tuple[int, int]:
     return width, height
 
 
-def extract_strokes_for_project_image(
+async def extract_strokes_for_project_image(
     project_id: str,
     rel_image_path: str,
     object_hints: Optional[List[str]] = None,
@@ -311,7 +311,7 @@ def extract_strokes_for_project_image(
     rel_stroke = stroke_json_path_for_sketch(rel_image_path)
     out_path = proj / rel_stroke
     debug_path = proj / vision_debug_json_path_for_sketch(rel_image_path)
-    extract_stroke_data(
+    await extract_stroke_data(
         image_path,
         out_path,
         object_hints=object_hints,
@@ -337,11 +337,13 @@ def backfill_stroke_assets_for_project(project_id: str) -> int:
         except (IndexError, ValueError):
             pass
         scene = scenes_by_id.get(scene_id, {}) if scene_id else {}
-        extract_strokes_for_project_image(
-            project_id,
-            rel,
-            object_hints=scene.get("keywords"),
-            visual_description=scene.get("visual_description", ""),
+        asyncio.run(
+            extract_strokes_for_project_image(
+                project_id,
+                rel,
+                object_hints=scene.get("keywords"),
+                visual_description=scene.get("visual_description", ""),
+            )
         )
         count += 1
     return count

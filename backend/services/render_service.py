@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from config import settings
-from models.schemas import PipelineStep, RenderManifest, ScriptSchema
+from models.schemas import PipelineStep, RenderManifest, ScriptSchema, LanguageMode
 from services.scene_planner import build_visual_scenes
 from services.timeline_sync import build_render_manifest
 from services.voice_service import generate_voices_for_script  # kept for backward compat
@@ -28,6 +28,8 @@ async def run_full_pipeline(
     voice: str,
     language: str,
     educational_level: str = "high_school",
+    language_mode: str = "english",
+    tts_provider: str = "edge_tts",
 ) -> None:
     try:
         import logging
@@ -40,6 +42,7 @@ async def run_full_pipeline(
 
         memory = _load_semantic_memory()
         memory_hints = _resolve_memory_entry(topic, memory)
+        lang_mode = LanguageMode(language_mode)
 
         # ── Lesson Plan: reuse existing if available, else generate fresh ───────
         existing_plan = load_json(project_id, "lesson_plan.json")
@@ -62,6 +65,7 @@ async def run_full_pipeline(
             topic, duration, style, language,
             educational_level=educational_level,
             lesson_plan=lesson_plan_dict,
+            language_mode=lang_mode,
         )
 
         # ── Narration Quality Review (with dynamic thresholds & cost controls) ──
@@ -79,7 +83,7 @@ async def run_full_pipeline(
         }
 
         if settings.quality_review_enabled:
-            quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict)
+            quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict, lang_mode)
             quality_data["threshold_applied"] = threshold
             save_json(project_id, "script_quality_review.json", quality_data)
 
@@ -110,8 +114,9 @@ async def run_full_pipeline(
                     topic, duration, style, language,
                     educational_level=educational_level,
                     lesson_plan=lesson_plan_dict,
+                    language_mode=lang_mode,
                 )
-                quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict)
+                quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict, lang_mode)
                 quality_data["threshold_applied"] = threshold
                 save_json(project_id, "script_quality_review.json", quality_data)
 
@@ -124,6 +129,12 @@ async def run_full_pipeline(
             # Fall back to best version generated if all attempts failed
             script_data = best_script
             quality_data = best_quality
+
+        # Save validation telemetry/audit logs
+        validation_telemetry = getattr(llm_service, "last_language_validation", None)
+        if validation_telemetry:
+            quality_data["language_validation"] = validation_telemetry
+            save_json(project_id, "script_quality_review.json", quality_data)
 
         # ── Store Pedagogical Metrics (Phase 3) ──────────────────────────────────
         metrics_data = {
@@ -138,11 +149,27 @@ async def run_full_pipeline(
                 quality_data.get("overall_score", 1.0) < (threshold if settings.quality_review_enabled else 0.0)
             )
         }
+        if validation_telemetry:
+            metrics_data["language_validation"] = validation_telemetry
         save_json(project_id, "pedagogical_metrics.json", metrics_data)
 
         script = ScriptSchema.model_validate(script_data)
+        script.language_mode = lang_mode
+        for scene in script.scenes:
+            scene.language_mode = lang_mode
         script = normalize_script_durations(script, duration)
         save_json(project_id, "script.json", script.model_dump())
+
+        # Generate project_manifest.json
+        manifest_data = {
+            "language_mode": lang_mode.value,
+            "requested_language": lang_mode.value,
+            "screen_language": "english",
+            "narration_language": lang_mode.value,
+            "tts_provider": tts_provider,
+        }
+        save_json(project_id, "project_manifest.json", manifest_data)
+
         existing_cfg = load_json(project_id, "config.json") or {}
         save_json(project_id, "config.json", {
             **existing_cfg,
@@ -152,6 +179,8 @@ async def run_full_pipeline(
             "voice": voice,
             "language": language,
             "educational_level": educational_level,
+            "language_mode": lang_mode.value,
+            "tts_provider": tts_provider,
         })
 
         job_queue.update_job(
@@ -596,6 +625,11 @@ async def _merge_audio_ffmpeg(project_id: str, manifest: RenderManifest) -> Path
         if raw_video.exists():
             raw_video.rename(final_video)
         return final_video
+
+    # Detect audio format from first scene's file extension
+    first_audio_ext = Path(scene_audio_inputs[0][1]).suffix.lower()  # e.g. ".wav" or ".mp3"
+    # Use mp3 for combined output (ffmpeg can always encode to mp3 regardless of source format)
+    combined_audio = proj_path / "voices" / "combined.mp3"
 
     # Pad each scene's voice to its video slot, then concat (matches scene boundaries)
     padded_paths: List[str] = []

@@ -1,0 +1,555 @@
+{
+  "timestamp": "2026-06-12 18:22:10",
+  "model_under_evaluation": "AI4Bharat IndicXlit",
+  "eval_scores": {
+    "translation_detected": false,
+    "phonetic_preservation_score": 100.0,
+    "technical_term_preservation_score": 100.0,
+    "roman_character_leakage_percent": 0.0,
+    "xtts_ready": true
+  },
+  "vocabulary_stress_test": {
+    "Force": {
+      "expected": [
+        "फोर्स"
+      ],
+      "candidates": [
+        "फोर्स",
+        "फोर्से",
+        "फ़ोर्स",
+        "फॉर्स",
+        "फोरस"
+      ],
+      "matched": true,
+      "matched_term": "फोर्स"
+    },
+    "Momentum": {
+      "expected": [
+        "मोमेंटम"
+      ],
+      "candidates": [
+        "मोमेंटम",
+        "मोमेन्टम",
+        "मॉमेंटम",
+        "मोमैंटम",
+        "मॉमेन्टम"
+      ],
+      "matched": true,
+      "matched_term": "मोमेंटम"
+    },
+    "Velocity": {
+      "expected": [
+        "वेलोसिटी"
+      ],
+      "candidates": [
+        "वेलोसिटी",
+        "वेलॉसिटी",
+        "वेलासिटी",
+        "वैलोसिटी",
+        "विलोसिटी"
+      ],
+      "matched": true,
+      "matched_term": "वेलोसिटी"
+    },
+    "Acceleration": {
+      "expected": [
+        "एक्सेलेरेशन",
+        "ऐक्सेलेरेशन"
+      ],
+      "candidates": [
+        "एक्सेलेरेशन",
+        "एक्सीलरेशन",
+        "एक्सेलरेशन",
+        "एक्सिलरेशन",
+        "एक्सिलेरेशन"
+      ],
+      "matched": true,
+      "matched_term": "एक्सेलेरेशन"
+    },
+    "Photosynthesis": {
+      "expected": [
+        "फोटोसिंथेसिस"
+      ],
+      "candidates": [
+        "फोटोसिंथेसिस",
+        "फोटोसिन्थेसिस",
+        "फोटोसिंथिसिस",
+        "फोटोसिन्थिसिस",
+        "फोटोसिंथीसिस"
+      ],
+      "matched": true,
+      "matched_term": "फोटोसिंथेसिस"
+    },
+    "Respiration": {
+      "expected": [
+        "रेस्पिरेशन"
+      ],
+      "candidates": [
+        "रेस्पिरेशन",
+        "रेस्पीरेशन",
+        "रेसपिरेशन",
+        "रेस्पाइरेशन",
+        "रिस्पिरेशन"
+      ],
+      "matched": true,
+      "matched_term": "रेस्पिरेशन"
+    },
+    "Mitochondria": {
+      "expected": [
+        "माइटोकॉन्ड्रिया",
+        "माइटोकोंड्रिया"
+      ],
+      "candidates": [
+        "माइटोकॉन्ड्रिया",
+        "माइटोकांड्रिया",
+        "माइटोकोंड्रिया",
+        "माइटोकोन्ड्रिया",
+        "माइटोचोंद्रिया"
+      ],
+      "matched": true,
+      "matched_term": "माइटोकॉन्ड्रिया"
+    },
+    "Backend": {
+      "expected": [
+        "बैकएंड",
+        "बैकऐंड",
+        "बैक-एंड"
+      ],
+      "candidates": [
+        "बैकएंड",
+        "बैकेंड",
+        "बैकेन्ड",
+        "बैकएन्ड",
+        "बैकेण्ड"
+      ],
+      "matched": true,
+      "matched_term": "बैकएंड"
+    },
+    "Frontend": {
+      "expected": [
+        "फ्रंटएंड",
+        "फ्रंटऐंड",
+        "फ्रंट-एंड",
+        "फ्रंटेंड"
+      ],
+      "candidates": [
+        "फ्रंटेंड",
+        "फ्रंटेन्ड",
+        "फ्रन्टेंड",
+        "फ़्रंटेंड",
+        "फ्रंटेण्ड"
+      ],
+      "matched": true,
+      "matched_term": "फ्रंटेंड"
+    },
+    "Docker": {
+      "expected": [
+        "डॉकर"
+      ],
+      "candidates": [
+        "डॉकर",
+        "डाकर",
+        "डोकर",
+        "डॉकेर",
+        "डाकेर"
+      ],
+      "matched": true,
+      "matched_term": "डॉकर"
+    },
+    "Kubernetes": {
+      "expected": [
+        "कुबेरनेट्स",
+        "कुबर्नटीस",
+        "कुबरनेट्स",
+        "कुबेरनेटेस"
+      ],
+      "candidates": [
+        "कुबेरनेटेस",
+        "कुबेरनेतेस",
+        "कुबेरनेट्स",
+        "कुबरनेटेस",
+        "कुबेरनीट्स"
+      ],
+      "matched": true,
+      "matched_term": "कुबेरनेटेस"
+    },
+    "FastAPI": {
+      "expected": [
+        "फास्टएपीआई",
+        "फ़ास्टएपीआई",
+        "फास्ट एपीआई"
+      ],
+      "candidates": [
+        "फास्ट एपीआई",
+        "फास्टएपीआई",
+        "फास्ट एपीआइ",
+        "फास्टएपीआइ",
+        "फास्ट अपी"
+      ],
+      "matched": true,
+      "matched_term": "फास्ट एपीआई"
+    },
+    "React": {
+      "expected": [
+        "रिएक्ट",
+        "रिऐक्ट"
+      ],
+      "candidates": [
+        "रिएक्ट",
+        "रियेक्ट",
+        "रीएक्ट",
+        "रियैक्ट",
+        "रियाक्ट"
+      ],
+      "matched": true,
+      "matched_term": "रिएक्ट"
+    },
+    "MongoDB": {
+      "expected": [
+        "मोंगोडीबी",
+        "मोंगो डीबी",
+        "मंगोडीबी",
+        "मोंगोदब",
+        "मोंगो दब",
+        "मोंगो दीब",
+        "मोंगोदेब",
+        "मोंगोडब"
+      ],
+      "candidates": [
+        "मोंगो दब",
+        "मोंगोदब",
+        "मोंगो देब",
+        "मोंगोदेब",
+        "मोंगो दीब"
+      ],
+      "matched": true,
+      "matched_term": "मोंगो दब"
+    },
+    "API": {
+      "expected": [
+        "एपीआई",
+        "ए.पी.आई."
+      ],
+      "candidates": [
+        "एपीआई",
+        "एपीआइ",
+        "अपी",
+        "आपी",
+        "आपीआई"
+      ],
+      "matched": true,
+      "matched_term": "एपीआई"
+    },
+    "Database": {
+      "expected": [
+        "डेटाबेस",
+        "डाटाबेस"
+      ],
+      "candidates": [
+        "डेटाबेस",
+        "डाटाबेस",
+        "डेटाबेज",
+        "डैटाबेस",
+        "डेटाबेज़"
+      ],
+      "matched": true,
+      "matched_term": "डेटाबेस"
+    },
+    "Microservices": {
+      "expected": [
+        "माइक्रोसर्विसेज",
+        "माइक्रो-सर्विसेज"
+      ],
+      "candidates": [
+        "माइक्रोसर्विसेज",
+        "माइक्रोसर्विस",
+        "माइक्रोसर्विसेस",
+        "माइक्रोसर्विसिस",
+        "माइक्रोसर्विसों"
+      ],
+      "matched": true,
+      "matched_term": "माइक्रोसर्विसेज"
+    }
+  },
+  "conversational_eval": {
+    "physics_sample": {
+      "input": "Newton ka first law kehta hai ki agar koi object rest mein hai to woh rest mein hi rahega. Force apply karne par hi motion change hota hai. Velocity aur Acceleration iske basic parameters hain.",
+      "output": "न्यूटन का फर्स्ट लाव कहता है की अगर कोई ऑब्जेक्ट रेस्ट में है तो वोह रेस्ट में ही रहेगा. फोर्स एप्लाई करने पर ही मोशन चंगे होता है. वेलोसिटी और एक्सेलेरेशन इसके बेसिक पैरामीटर हैं।",
+      "keyword_eval": [
+        {
+          "word": "Force",
+          "expected": [
+            "फोर्स"
+          ],
+          "found": true,
+          "found_term": "फोर्स"
+        },
+        {
+          "word": "Velocity",
+          "expected": [
+            "वेलोसिटी"
+          ],
+          "found": true,
+          "found_term": "वेलोसिटी"
+        },
+        {
+          "word": "Acceleration",
+          "expected": [
+            "एक्सेलेरेशन",
+            "ऐक्सेलेरेशन"
+          ],
+          "found": true,
+          "found_term": "एक्सेलेरेशन"
+        }
+      ],
+      "roman_chars_leaked": 0
+    },
+    "biology_sample": {
+      "input": "Photosynthesis plants mein energy produce karne ka ek primary process hai. Cellular Respiration ke dauran Mitochondria ATP energy generate karta hai.",
+      "output": "फोटोसिंथेसिस प्लांट्स में एनर्जी प्रोड्यूस करने का एक प्राइमरी प्रोसेस है. सेल्युलर रेस्पिरेशन के दौरान माइटोकॉन्ड्रिया एटीपी एनर्जी जनरेट करता है।",
+      "keyword_eval": [
+        {
+          "word": "Photosynthesis",
+          "expected": [
+            "फोटोसिंथेसिस"
+          ],
+          "found": true,
+          "found_term": "फोटोसिंथेसिस"
+        },
+        {
+          "word": "Respiration",
+          "expected": [
+            "रेस्पिरेशन"
+          ],
+          "found": true,
+          "found_term": "रेस्पिरेशन"
+        },
+        {
+          "word": "Mitochondria",
+          "expected": [
+            "माइटोकॉन्ड्रिया",
+            "माइटोकोंड्रिया"
+          ],
+          "found": true,
+          "found_term": "माइटोकॉन्ड्रिया"
+        }
+      ],
+      "roman_chars_leaked": 0
+    },
+    "cs_sample": {
+      "input": "React Frontend ke liye ek dynamic user interface library hai, jabki FastAPI Backend api framework hai. Docker aur Kubernetes microservices architecture ko deploy karte hain.",
+      "output": "रिएक्ट फ्रंटेंड के लिए एक डायनामिक यूजर इंटरफेस लाइब्रेरी है, जबकी फास्ट एपीआई बैकएंड एपीआई फ्रेमवर्क है. डॉकर और कुबेरनेटेस माइक्रोसर्विसेज आर्किटेक्चर को डिप्लॉय करते हैं।",
+      "keyword_eval": [
+        {
+          "word": "React",
+          "expected": [
+            "रिएक्ट",
+            "रिऐक्ट"
+          ],
+          "found": true,
+          "found_term": "रिएक्ट"
+        },
+        {
+          "word": "Frontend",
+          "expected": [
+            "फ्रंटएंड",
+            "फ्रंटऐंड",
+            "फ्रंट-एंड",
+            "फ्रंटेंड"
+          ],
+          "found": true,
+          "found_term": "फ्रंटेंड"
+        },
+        {
+          "word": "FastAPI",
+          "expected": [
+            "फास्टएपीआई",
+            "फ़ास्टएपीआई",
+            "फास्ट एपीआई"
+          ],
+          "found": true,
+          "found_term": "फास्ट एपीआई"
+        },
+        {
+          "word": "Backend",
+          "expected": [
+            "बैकएंड",
+            "बैकऐंड",
+            "बैक-एंड"
+          ],
+          "found": true,
+          "found_term": "बैकएंड"
+        },
+        {
+          "word": "Docker",
+          "expected": [
+            "डॉकर"
+          ],
+          "found": true,
+          "found_term": "डॉकर"
+        },
+        {
+          "word": "Kubernetes",
+          "expected": [
+            "कुबेरनेट्स",
+            "कुबर्नटीस",
+            "कुबरनेट्स",
+            "कुबेरनेटेस"
+          ],
+          "found": true,
+          "found_term": "कुबेरनेटेस"
+        },
+        {
+          "word": "API",
+          "expected": [
+            "एपीआई",
+            "ए.पी.आई."
+          ],
+          "found": true,
+          "found_term": "एपीआई"
+        },
+        {
+          "word": "Microservices",
+          "expected": [
+            "माइक्रोसर्विसेज",
+            "माइक्रो-सर्विसेज"
+          ],
+          "found": true,
+          "found_term": "माइक्रोसर्विसेज"
+        }
+      ],
+      "roman_chars_leaked": 0
+    },
+    "long_narration_sample": {
+      "input": "Chaliye aaj hum microservices architecture aur database design ke baare mein baat karte hain. Jab aap ek complex system design karte hain, to multiple API routes create karne hote hain aur MongoDB ya PostgreSQL jaise Database systems ka use kiya jata hai. Microservices ki wajah se backend scalable banta hai, lekin isme API latency aur configuration management ke challenges aate hain. Socho, agar hum har service ko containerize karein, to isse system security aur deployment dynamic ho jata hai. Force, Momentum aur Velocity physics ke basic concepts hain jise hum computer modeling se optimize kar sakte hain.",
+      "output": "चलिए आज हम माइक्रोसर्विसेज आर्किटेक्चर और डेटाबेस डिजाइन के बारे में बात करते हैं. जब आप एक कॉम्प्लेक्स सिस्टम डिजाइन करते हैं, तो मल्टीपल एपीआई रूट्स क्रिएट करने होते हैं और मोंगो दब या पोस्टग्रे एसक्यूएल जैसे डेटाबेस सिस्टम का उसे किया जाता है. माइक्रोसर्विसेज की वजह से बैकएंड स्केलेबल बांटा है, लेकिन इसमे एपीआई लेटेंसी और कॉन्फिगरेशन मैनेजमेंट के चैलेंज आते हैं. सोचो, अगर हम हर सर्विस को कंटेनराइज करें, तो इस्से सिस्टम सिक्योरिटी और डिप्लॉयमेंट डायनामिक हो जाता है. फोर्स, मोमेंटम और वेलोसिटी फिजिक्स के बेसिक कंसेप्ट्स हैं जिसे हम कंप्यूटर मॉडलिंग से ऑप्टिमाइज़ कर सकते हैं।",
+      "keyword_eval": [
+        {
+          "word": "Microservices",
+          "expected": [
+            "माइक्रोसर्विसेज",
+            "माइक्रो-सर्विसेज"
+          ],
+          "found": true,
+          "found_term": "माइक्रोसर्विसेज"
+        },
+        {
+          "word": "Database",
+          "expected": [
+            "डेटाबेस",
+            "डाटाबेस"
+          ],
+          "found": true,
+          "found_term": "डेटाबेस"
+        },
+        {
+          "word": "API",
+          "expected": [
+            "एपीआई",
+            "ए.पी.आई."
+          ],
+          "found": true,
+          "found_term": "एपीआई"
+        },
+        {
+          "word": "MongoDB",
+          "expected": [
+            "मोंगोडीबी",
+            "मोंगो डीबी",
+            "मंगोडीबी",
+            "मोंगोदब",
+            "मोंगो दब",
+            "मोंगो दीब",
+            "मोंगोदेब",
+            "मोंगोडब"
+          ],
+          "found": true,
+          "found_term": "मोंगो दब"
+        },
+        {
+          "word": "Database",
+          "expected": [
+            "डेटाबेस",
+            "डाटाबेस"
+          ],
+          "found": true,
+          "found_term": "डेटाबेस"
+        },
+        {
+          "word": "Backend",
+          "expected": [
+            "बैकएंड",
+            "बैकऐंड",
+            "बैक-एंड"
+          ],
+          "found": true,
+          "found_term": "बैकएंड"
+        },
+        {
+          "word": "API",
+          "expected": [
+            "एपीआई",
+            "ए.पी.आई."
+          ],
+          "found": true,
+          "found_term": "एपीआई"
+        },
+        {
+          "word": "Force",
+          "expected": [
+            "फोर्स"
+          ],
+          "found": true,
+          "found_term": "फोर्स"
+        },
+        {
+          "word": "Momentum",
+          "expected": [
+            "मोमेंटम"
+          ],
+          "found": true,
+          "found_term": "मोमेंटम"
+        },
+        {
+          "word": "Velocity",
+          "expected": [
+            "वेलोसिटी"
+          ],
+          "found": true,
+          "found_term": "वेलोसिटी"
+        }
+      ],
+      "roman_chars_leaked": 0
+    }
+  },
+  "xtts_audio_validation": {
+    "physics_sample": {
+      "generated": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\indicxlit_benchmark\\outputs\\physics_sample.wav",
+      "generation_time_seconds": 31.74,
+      "audio_duration_seconds": 16.36,
+      "peak_ram_mb": 2722.99
+    },
+    "biology_sample": {
+      "generated": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\indicxlit_benchmark\\outputs\\biology_sample.wav",
+      "generation_time_seconds": 22.44,
+      "audio_duration_seconds": 11.17,
+      "peak_ram_mb": 2751.58
+    },
+    "cs_sample": {
+      "generated": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\indicxlit_benchmark\\outputs\\cs_sample.wav",
+      "generation_time_seconds": 24.96,
+      "audio_duration_seconds": 12.66,
+      "peak_ram_mb": 2867.48
+    },
+    "long_narration_sample": {
+      "generated": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\indicxlit_benchmark\\outputs\\long_narration_sample.wav",
+      "generation_time_seconds": 81.71,
+      "audio_duration_seconds": 40.88,
+      "peak_ram_mb": 3057.0
+    }
+  }
+}

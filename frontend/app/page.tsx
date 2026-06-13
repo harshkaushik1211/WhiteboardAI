@@ -8,6 +8,11 @@ import { Card } from "@/components/ui/card";
 import { TopicInput } from "@/components/TopicInput";
 import { generateScript, renderVideo } from "@/lib/api";
 import type { VoiceProvider } from "@/lib/types";
+const LANGUAGE_OPTIONS = [
+  { label: "English", value: "english" },
+  { label: "Hindi", value: "hindi" },
+  { label: "Hinglish (Roman + Hindi mix)", value: "hinglish" }
+];
 
 export default function HomePage() {
   const router = useRouter();
@@ -15,9 +20,19 @@ export default function HomePage() {
   const [duration, setDuration] = useState(60);
   const [style, setStyle] = useState("whiteboard");
   const [voice, setVoice] = useState("male");
-  const [voiceProvider, setVoiceProvider] = useState<VoiceProvider>("edge");
+  const [ttsProvider, setTtsProvider] = useState<string>("f5tts");
+  const [languageMode, setLanguageMode] = useState("english");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleLanguageChange = (val: string) => {
+    setLanguageMode(val);
+    if (val === "hindi" || val === "hinglish") {
+      setTtsProvider("xtts_hindi");
+    } else {
+      setTtsProvider("f5tts");
+    }
+  };
 
   const handleGenerate = async () => {
     if (!topic.trim()) {
@@ -33,7 +48,9 @@ export default function HomePage() {
         style,
         voice,
         language: "english",
-        voice_provider: voiceProvider,
+        language_mode: languageMode,
+        voice_provider: ttsProvider === "f5tts" ? "f5tts" : ttsProvider === "xtts_hindi" ? "xtts_hindi" : "edge",
+        tts_provider: ttsProvider,
         avatar_provider: null,
       });
       const { job_id } = await renderVideo(project_id);
@@ -59,7 +76,9 @@ export default function HomePage() {
         style,
         voice,
         language: "english",
-        voice_provider: voiceProvider,
+        language_mode: languageMode,
+        voice_provider: ttsProvider === "f5tts" ? "f5tts" : ttsProvider === "xtts_hindi" ? "xtts_hindi" : "edge",
+        tts_provider: ttsProvider,
         avatar_provider: null,
       });
       router.push(`/project/${project_id}`);
@@ -98,22 +117,58 @@ export default function HomePage() {
           </p>
 
           <div className="space-y-2">
-            <label className="text-sm text-white/70">Voice provider</label>
+            <label className="text-sm text-white/70">Narration Engine</label>
             <select
-              id="voice-provider-select"
-              value={voiceProvider}
-              onChange={(e) => setVoiceProvider(e.target.value as VoiceProvider)}
-              className="w-full h-10 rounded-lg bg-white/5 border border-white/20 px-3 text-white"
+              id="tts-provider-select"
+              value={ttsProvider}
+              onChange={(e) => setTtsProvider(e.target.value)}
+              disabled={languageMode === "hindi" || languageMode === "hinglish"}
+              className="w-full h-10 rounded-lg bg-white/5 border border-white/20 px-3 text-white disabled:opacity-50"
             >
-              <option value="edge">Edge-TTS (instant, local)</option>
-              <option value="f5tts">F5-TTS (export → external → import)</option>
+              {languageMode === "english" ? (
+                <>
+                  <option value="f5tts">F5-TTS (export → external → import)</option>
+                  <option value="edge_tts">Edge-TTS (instant, local)</option>
+                </>
+              ) : (
+                <option value="xtts_hindi">XTTS Hindi (local, voice cloning)</option>
+              )}
             </select>
-            {voiceProvider === "f5tts" && (
+            {languageMode === "english" && ttsProvider === "f5tts" && (
               <p className="text-xs text-amber-400/80">
                 ⚠ F5-TTS mode: narration package will be exported. Upload WAV
                 audio on the project page before rendering.
               </p>
             )}
+            {(languageMode === "hindi" || languageMode === "hinglish") && (
+              <p className="text-xs text-emerald-400/80">
+                ✓ XTTS Hindi uses your teacher reference voice for cloning. Runs locally on CPU.
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm text-white/70">Narration Language</label>
+            <select
+              id="language-mode-select"
+              value={languageMode}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              className="w-full h-10 rounded-lg bg-white/5 border border-white/20 px-3 text-white"
+            >
+
+              {LANGUAGE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-white/50">
+              {languageMode === "english"
+                ? "Audio narration will be fully English."
+                : languageMode === "hindi"
+                ? "Audio narration will be spoken in pure Hindi (Devanagari). On-screen content remains English."
+                : "Audio narration will be spoken in conversational Hinglish while all on-screen content remains English."}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

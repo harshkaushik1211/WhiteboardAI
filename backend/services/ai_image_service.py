@@ -101,8 +101,7 @@ async def generate_scene_image_for_project(
         keywords,
         prior_headline,
     )
-    stroke_rel = await asyncio.to_thread(
-        extract_strokes_for_project_image,
+    stroke_rel = await extract_strokes_for_project_image(
         project_id,
         rel,
         keywords,

@@ -1,0 +1,29 @@
+{
+  "experiment_name": "Hinglish Transliteration Script Study",
+  "model": "tts_models/multilingual/multi-dataset/xtts_v2",
+  "cpu_only": true,
+  "reference_wav": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\reference\\teacher_short.wav",
+  "results": {
+    "roman_hinglish": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\roman_hinglish.wav",
+      "duration": "15.49 seconds",
+      "generation_time_seconds": 33.66,
+      "notes": "Pending manual listening verification"
+    },
+    "transliterated_hinglish": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\transliterated_hinglish.wav",
+      "duration": "8.96 seconds",
+      "generation_time_seconds": 19.25,
+      "notes": "Pending manual listening verification"
+    },
+    "pure_hindi": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\pure_hindi.wav",
+      "duration": "13.37 seconds",
+      "generation_time_seconds": 28.8,
+      "notes": "Pending manual listening verification"
+    }
+  }
+}

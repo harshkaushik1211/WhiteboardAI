@@ -79,7 +79,7 @@ export interface AiImageAuditEntry {
   object_count?: number;
 }
 
-export type VoiceProvider = "edge" | "f5tts";
+export type VoiceProvider = "edge" | "f5tts" | "edge_tts" | "xtts_hindi";
 
 export type AvatarProvider = "liveportrait" | "musetalk" | "sadtalker" | null;
 
@@ -89,7 +89,9 @@ export interface GenerateConfig {
   style: string;
   voice: string;
   language: string;
+  language_mode?: string;
   voice_provider?: VoiceProvider;
+  tts_provider?: string;
   avatar_provider?: AvatarProvider;
 }
 

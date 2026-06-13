@@ -8,6 +8,7 @@ from openai import AsyncOpenAI
 from config import settings
 from prompts.script_prompt import SCRIPT_SYSTEM_PROMPT, build_script_prompt
 from prompts.scene_prompt import SCENE_SYSTEM_PROMPT, build_scene_prompt
+from models.schemas import LanguageMode
 
 logger = logging.getLogger("llm_service")
 
@@ -52,6 +53,24 @@ class LLMService:
             content = re.sub(r"\n?```$", "", content)
         return json.loads(content)
 
+    async def clean_devanagari_narration(self, text: str) -> str:
+        """Helper to rewrite a Devanagari Hinglish narration to Roman Hinglish script."""
+        system = "You are an expert Hinglish translator. You rewrite text to ensure it is in natural Hinglish written ONLY in Roman script (Latin alphabet). Never use Devanagari characters."
+        user = f"Rewrite the following narration into natural conversational Hinglish.\n\nRules:\n- Use Roman script only.\n- Do not use any Devanagari characters.\n- Preserve meaning exactly.\n- Preserve scientific terminology in English.\n- Preserve educational quality.\n- Do not shorten the narration.\n\nNarration to rewrite:\n{text}"
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
+                temperature=0.3,
+            )
+            return (response.choices[0].message.content or "").strip()
+        except Exception as e:
+            logger.error(f"Failed to clean Devanagari narration: {e}")
+            return text
+
     async def generate_script(
         self,
         topic: str,
@@ -62,6 +81,7 @@ class LLMService:
         lesson_plan: Optional[Dict[str, Any]] = None,
         concept_graph: Optional[Dict[str, Any]] = None,
         assigned_scene_concepts: Optional[Dict[str, List[str]]] = None,
+        language_mode: LanguageMode = LanguageMode.ENGLISH,
     ) -> Dict[str, Any]:
         """Generate an educational whiteboard script.
 
@@ -74,6 +94,7 @@ class LLMService:
             lesson_plan: Pre-generated lesson plan dict from lesson_planner service.
             concept_graph: Pre-generated ConceptGraph dict (Phase 6).
             assigned_scene_concepts: Concept allocation dict mapping scene ID (str) to concepts.
+            language_mode: Target narration language mode (english or hinglish).
 
         Returns:
             Raw script dict with title, total_duration, and scenes list.
@@ -89,14 +110,60 @@ class LLMService:
             lesson_plan=lesson_plan,
             concept_graph=concept_graph,
             assigned_scene_concepts=assigned_scene_concepts,
+            language_mode=language_mode,
         )
-        return await self._chat_json(SCRIPT_SYSTEM_PROMPT, prompt)
+        script_data = await self._chat_json(SCRIPT_SYSTEM_PROMPT, prompt)
+
+        # Devanagari Roman Script Validation Guard
+        telemetry = {
+            "language_mode": language_mode.value,
+            "roman_script_validation": language_mode == LanguageMode.HINGLISH,
+            "devanagari_detected": False,
+            "rewrite_attempts": 0,
+            "validation_passed": True
+        }
+        self.last_language_validation = telemetry
+
+        if language_mode == LanguageMode.HINGLISH and "scenes" in script_data:
+            from utils.language_validator import contains_devanagari
+            
+            any_devanagari = False
+            for scene in script_data["scenes"]:
+                if contains_devanagari(scene.get("narration", "")):
+                    any_devanagari = True
+                    break
+                    
+            if any_devanagari:
+                telemetry["devanagari_detected"] = True
+                telemetry["rewrite_attempts"] = 1
+                logger.info("[LANGUAGE_GUARD] Devanagari detected in narration. Triggering auto-rewrite recovery pass.")
+                
+                for scene in script_data["scenes"]:
+                    narration = scene.get("narration", "")
+                    if contains_devanagari(narration):
+                        cleaned = await self.clean_devanagari_narration(narration)
+                        scene["narration"] = cleaned
+                        
+                # Validate again
+                still_has_devanagari = False
+                for scene in script_data["scenes"]:
+                    if contains_devanagari(scene.get("narration", "")):
+                        still_has_devanagari = True
+                        break
+                if still_has_devanagari:
+                    telemetry["validation_passed"] = False
+                    logger.warning("[LANGUAGE_GUARD] Roman script validation failed even after rewrite pass! Continuing pipeline.")
+                else:
+                    logger.info("[LANGUAGE_GUARD] Roman script validation successfully recovered and passed!")
+
+        return script_data
 
     async def review_script_quality(
         self,
         script_data: Dict[str, Any],
         educational_level: str = "high_school",
         lesson_plan: Optional[Dict[str, Any]] = None,
+        language_mode: LanguageMode = LanguageMode.ENGLISH,
     ) -> Dict[str, Any]:
         """Evaluate narration quality across 11 pedagogical dimensions.
 
@@ -110,6 +177,7 @@ class LLMService:
             script_data: Raw script dict from generate_script().
             educational_level: Used to calibrate vocabulary/depth expectations.
             lesson_plan: Optional pre-script lesson planner details for coverage review.
+            language_mode: Target narration language mode (english or hinglish).
 
         Returns:
             Dict with dimension scores, overall_score, needs_rewrite, rewrite_reasons.
@@ -117,7 +185,7 @@ class LLMService:
         from prompts.quality_review_prompt import QUALITY_REVIEW_SYSTEM, build_quality_review_prompt
 
         try:
-            prompt = build_quality_review_prompt(script_data, educational_level, lesson_plan)
+            prompt = build_quality_review_prompt(script_data, educational_level, lesson_plan, language_mode)
             result = await self._chat_json(QUALITY_REVIEW_SYSTEM, prompt)
             logger.info(
                 f"[SCRIPT_QUALITY] Score: {result.get('overall_score', '?'):.2f} | "

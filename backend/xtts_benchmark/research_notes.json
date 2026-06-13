@@ -1,0 +1,29 @@
+{
+  "architecture": {
+    "model_name": "XTTS-v2 (multilingual)",
+    "base_architecture": "Autoregressive GPT + VAE (Tortoise-TTS derivative) + Vocoder (HiFi-GAN/Vocos)",
+    "description": "Zero-shot text-to-speech speaker cloning model supporting 17 languages, including English and Hindi, from a short 3-10 second audio prompt.",
+    "voice_cloning_type": "Zero-shot cloning (requires no fine-tuning or voice training at runtime)"
+  },
+  "hindi_hinglish_support": {
+    "native_language_code": "hi",
+    "hinglish_handling": "Since Hinglish uses mixed grammar and vocabulary, it is run with language='hi' or language='en'. The benchmark will evaluate romanized Hinglish (Variant A), mixed script Hinglish (Variant B), and translated pure Devanagari Hindi (Variant C) to determine the best input format for clear pronunciation.",
+    "supported_languages": ["en", "es", "fr", "de", "it", "pt", "pl", "tr", "ru", "nl", "cs", "ar", "zh-cn", "hu", "ko", "ja", "hi"]
+  },
+  "cpu_inference": {
+    "supported": true,
+    "arguments": "gpu=False in TTS class initialization forces CPU usage",
+    "ram_requirements": "~4-6 GB peak memory usage during model loading and generation"
+  },
+  "voice_cloning_workflow": {
+    "reference_wav_requirements": "3-10 second clip of clean, noise-free speech in WAV format, ideally at 22050Hz or 24000Hz sample rate",
+    "conditioning": "Passed as speaker_wav argument during text-to-speech generation"
+  },
+  "dependencies": {
+    "core": "coqui-tts>=0.27.0 (Idiap community fork supporting Python 3.13)",
+    "pytorch": "torch>=2.0.0, torchcodec>=0.14.0 (for PyTorch 2.9+ compatibility)",
+    "audio": "soundfile, librosa",
+    "utilities": "psutil"
+  },
+  "inference_code_example": "from TTS.api import TTS\ntts = TTS('tts_models/multilingual/multi-dataset/xtts_v2', gpu=False)\ntts.tts_to_file(\n    text='Aaj hum Newton ke Laws of Motion ke baare mein padhenge.',\n    speaker_wav='xtts_benchmark/reference/teacher_short.wav',\n    language='hi',\n    file_path='xtts_benchmark/outputs/test_hinglish.wav'\n)"
+}

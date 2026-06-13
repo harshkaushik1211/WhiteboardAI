@@ -1,0 +1,260 @@
+{
+  "provider": "xtts_v2",
+  "model": "tts_models/multilingual/multi-dataset/xtts_v2",
+  "cpu_only": true,
+  "reference_wav": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\reference\\teacher_short.wav",
+  "reference_transcript": "Hello students. Today we are going to learn an interesting concept in physics. Let us begin our lesson.",
+  "results": {
+    "english_short": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_english_short.wav",
+      "language": "en",
+      "text_length_chars": 133,
+      "generation_time_seconds": 86.52,
+      "peak_ram_mb": 2659.45,
+      "ram_delta_mb": 190.36,
+      "audio_duration_seconds": 17.95,
+      "waveform_diagnostics": {
+        "shape": [
+          430896
+        ],
+        "min": -0.793212890625,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "hindi_short": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_hindi_short.wav",
+      "language": "hi",
+      "text_length_chars": 136,
+      "generation_time_seconds": 24.17,
+      "peak_ram_mb": 2735.47,
+      "ram_delta_mb": 75.93,
+      "audio_duration_seconds": 10.11,
+      "waveform_diagnostics": {
+        "shape": [
+          242704
+        ],
+        "min": -0.93853759765625,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "hinglish_short": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_hinglish_short.wav",
+      "language": "hi",
+      "text_length_chars": 141,
+      "generation_time_seconds": 158.13,
+      "peak_ram_mb": 2636.3,
+      "ram_delta_mb": -99.18,
+      "audio_duration_seconds": 20.13,
+      "waveform_diagnostics": {
+        "shape": [
+          483120
+        ],
+        "min": -0.81561279296875,
+        "max": 0.99993896484375
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "english_long": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_english_long.wav",
+      "language": "en",
+      "text_length_chars": 1070,
+      "generation_time_seconds": 719.77,
+      "peak_ram_mb": 2259.01,
+      "ram_delta_mb": -377.29,
+      "audio_duration_seconds": 80.82,
+      "waveform_diagnostics": {
+        "shape": [
+          1939648
+        ],
+        "min": -0.845977783203125,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "hinglish_long": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_hinglish_long.wav",
+      "language": "hi",
+      "text_length_chars": 1042,
+      "generation_time_seconds": 764.96,
+      "peak_ram_mb": 2203.64,
+      "ram_delta_mb": -55.37,
+      "audio_duration_seconds": 89.75,
+      "waveform_diagnostics": {
+        "shape": [
+          2153920
+        ],
+        "min": -0.90264892578125,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "hindi_long": {
+      "success": false,
+      "error": " ❗ XTTS can only generate text with a maximum of 400 tokens.",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\benchmark_xtts.py\", line 254, in run_generation\n    tts.tts_to_file(\n    ~~~~~~~~~~~~~~~^\n        text=text,\n        ^^^^^^^^^^\n    ...<2 lines>...\n        file_path=str(out_path),\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"C:\\projects\\WhiteboardAI\\backend\\venv\\Lib\\site-packages\\TTS\\api.py\", line 380, in tts_to_file\n    wav = self.tts(\n        text=text,\n    ...<4 lines>...\n        **kwargs,\n    )\n  File \"C:\\projects\\WhiteboardAI\\backend\\venv\\Lib\\site-packages\\TTS\\api.py\", line 329, in tts\n    wav = self.synthesizer.tts(\n        text=text,\n    ...<4 lines>...\n        **kwargs,\n    )\n  File \"C:\\projects\\WhiteboardAI\\backend\\venv\\Lib\\site-packages\\TTS\\utils\\synthesizer.py\", line 383, in tts\n    outputs = self.tts_model.synthesize(\n        text=sen,\n    ...<5 lines>...\n        **kwargs,\n    )\n  File \"C:\\projects\\WhiteboardAI\\backend\\venv\\Lib\\site-packages\\TTS\\tts\\models\\xtts.py\", line 445, in synthesize\n    return self.inference(text, language, gpt_cond_latent, speaker_embedding, **inference_settings)\n           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\projects\\WhiteboardAI\\backend\\venv\\Lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n  File \"C:\\projects\\WhiteboardAI\\backend\\venv\\Lib\\site-packages\\TTS\\tts\\models\\xtts.py\", line 518, in inference\n    assert text_tokens.shape[-1] < self.args.gpt_max_text_tokens, (\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError:  ❗ XTTS can only generate text with a maximum of 400 tokens.\n"
+    },
+    "variant_a": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_variant_a.wav",
+      "language": "hi",
+      "text_length_chars": 196,
+      "generation_time_seconds": 165.08,
+      "peak_ram_mb": 2193.29,
+      "ram_delta_mb": -13.48,
+      "audio_duration_seconds": 17.39,
+      "waveform_diagnostics": {
+        "shape": [
+          417328
+        ],
+        "min": -0.802215576171875,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "variant_b": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_variant_b.wav",
+      "language": "hi",
+      "text_length_chars": 185,
+      "generation_time_seconds": 112.73,
+      "peak_ram_mb": 2277.76,
+      "ram_delta_mb": 84.48,
+      "audio_duration_seconds": 13.64,
+      "waveform_diagnostics": {
+        "shape": [
+          327440
+        ],
+        "min": -0.983917236328125,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    },
+    "variant_c": {
+      "success": true,
+      "output_path": "C:\\projects\\WhiteboardAI\\backend\\xtts_benchmark\\outputs\\xtts_variant_c.wav",
+      "language": "hi",
+      "text_length_chars": 155,
+      "generation_time_seconds": 113.17,
+      "peak_ram_mb": 2213.96,
+      "ram_delta_mb": -63.8,
+      "audio_duration_seconds": 11.41,
+      "waveform_diagnostics": {
+        "shape": [
+          273936
+        ],
+        "min": -0.91363525390625,
+        "max": 0.999969482421875
+      },
+      "clone_fidelity": {
+        "speaker_similarity": null,
+        "clone_quality": null,
+        "accent_quality": null,
+        "naturalness": null,
+        "pronunciation": null,
+        "teacher_feel": null,
+        "overall_score": null,
+        "notes": "Fill after listening"
+      }
+    }
+  },
+  "success": false,
+  "provider_comparison": {
+    "note": "Fill after manual listening comparison with F5-TTS and Edge-TTS outputs.",
+    "table": [
+      {
+        "provider": "Edge-TTS",
+        "english": null,
+        "hindi": null,
+        "hinglish": null,
+        "teacher_cloning": "N/A",
+        "overall": null
+      },
+      {
+        "provider": "F5-TTS",
+        "english": null,
+        "hindi": null,
+        "hinglish": null,
+        "teacher_cloning": null,
+        "overall": null
+      },
+      {
+        "provider": "XTTS-v2 Hindi Finetuned",
+        "english": null,
+        "hindi": null,
+        "hinglish": null,
+        "teacher_cloning": null,
+        "overall": null
+      }
+    ]
+  }
+}

@@ -19,6 +19,7 @@ from models.schemas import (
     ScriptSchema,
     ScenePlanSchema,
     AvatarSceneResult,
+    LanguageMode,
 )
 from services.llm_service import llm_service
 from services.scene_planner import plan_scenes_for_script
@@ -156,6 +157,7 @@ async def generate_script(req: GenerateScriptRequest):
         lesson_plan=lesson_plan_dict,
         concept_graph=concept_graph.model_dump(),
         assigned_scene_concepts=allocation,
+        language_mode=req.language_mode,
     )
 
     # ── Step 3: Narration Quality Review (with dynamic thresholds & cost controls) ──
@@ -173,7 +175,7 @@ async def generate_script(req: GenerateScriptRequest):
     }
 
     if settings.quality_review_enabled:
-        quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict)
+        quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict, req.language_mode)
         quality_data["threshold_applied"] = threshold
         save_json(project_id, "script_quality_review.json", quality_data)
 
@@ -200,8 +202,9 @@ async def generate_script(req: GenerateScriptRequest):
                 req.topic, req.duration, req.style, req.language,
                 educational_level=educational_level,
                 lesson_plan=lesson_plan_dict,
+                language_mode=req.language_mode,
             )
-            quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict)
+            quality_data = await llm_service.review_script_quality(script_data, educational_level, lesson_plan_dict, req.language_mode)
             quality_data["threshold_applied"] = threshold
             save_json(project_id, "script_quality_review.json", quality_data)
 
@@ -214,6 +217,12 @@ async def generate_script(req: GenerateScriptRequest):
         # Fall back to best version generated if all attempts failed
         script_data = best_script
         quality_data = best_quality
+
+    # Save validation telemetry/audit logs
+    validation_telemetry = getattr(llm_service, "last_language_validation", None)
+    if validation_telemetry:
+        quality_data["language_validation"] = validation_telemetry
+        save_json(project_id, "script_quality_review.json", quality_data)
 
     # ── Store Pedagogical Metrics (Phase 3) ──────────────────────────────────
     metrics_data = {
@@ -228,12 +237,27 @@ async def generate_script(req: GenerateScriptRequest):
             quality_data.get("overall_score", 1.0) < (threshold if settings.quality_review_enabled else 0.0)
         )
     }
+    if validation_telemetry:
+        metrics_data["language_validation"] = validation_telemetry
     save_json(project_id, "pedagogical_metrics.json", metrics_data)
 
     # ── Step 5: Normalize durations (narration-preserving) ───────────────────
     script = ScriptSchema.model_validate(script_data)
+    script.language_mode = req.language_mode
+    for scene in script.scenes:
+        scene.language_mode = req.language_mode
     script = normalize_script_durations(script, req.duration)
     save_json(project_id, "script.json", script.model_dump())
+
+    # Generate project_manifest.json with original language request metadata
+    manifest_data = {
+        "language_mode": req.language_mode.value,
+        "requested_language": req.language_mode.value,
+        "screen_language": "english",
+        "narration_language": req.language_mode.value,
+        "tts_provider": req.tts_provider,
+    }
+    save_json(project_id, "project_manifest.json", manifest_data)
 
     # Persist full config including educational level and new voice/avatar provider fields.
     config = req.model_dump()
@@ -249,6 +273,7 @@ async def generate_script(req: GenerateScriptRequest):
         "project_id": project_id,
         "script": script.model_dump(),
         "voice_provider": req.voice_provider,
+        "tts_provider": req.tts_provider,
         "avatar_provider": req.avatar_provider,
         "lesson_plan": lesson_plan_dict,
         "quality_review": quality_data,
@@ -316,6 +341,7 @@ async def generate_voice(req: GenerateVoiceRequest):
         return {
             "project_id": req.project_id,
             "voice_provider": "f5tts",
+            "tts_provider": "f5tts",
             "status": "narration_package_exported",
             "message": (
                 "Narration package exported. Download it from "
@@ -326,11 +352,12 @@ async def generate_voice(req: GenerateVoiceRequest):
             "voice_results": [],
         }
 
-    # Edge-TTS: audio is ready.
+    # Edge-TTS / XTTS Hindi: audio is generated immediately and ready.
     save_json(req.project_id, "status.json", {"step": PipelineStep.VOICE.value})
     return {
         "project_id": req.project_id,
-        "voice_provider": "edge",
+        "voice_provider": "edge" if provider_key in ("edge", "edge_tts") else provider_key,
+        "tts_provider": provider_key,
         "voice_files": [v.audio_path for v in voice_results],
         "voice_results": [v.model_dump() for v in voice_results],
     }
@@ -355,6 +382,8 @@ async def render_video(req: RenderVideoRequest, background_tasks: BackgroundTask
         config.get("voice", "male"),
         config.get("language", "english"),
         config.get("educational_level", "high_school"),  # Forward educational level
+        config.get("language_mode", "english"),          # Forward language mode
+        config.get("tts_provider", "edge_tts"),          # Forward tts_provider
     )
 
     return {"job_id": job_id, "project_id": req.project_id}
@@ -369,6 +398,8 @@ async def _run_pipeline_task(
     voice: str,
     language: str,
     educational_level: str = "high_school",
+    language_mode: str = "english",
+    tts_provider: str = "edge_tts",
 ):
     await job_queue.run_job(
         job_id,
@@ -380,6 +411,8 @@ async def _run_pipeline_task(
         voice,
         language,
         educational_level,
+        language_mode,
+        tts_provider,
     )
 
 
@@ -1095,3 +1128,18 @@ async def get_avatar_metrics():
         return metrics_service.get_aggregate_metrics()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to load metrics: {exc}")
+
+
+@router.get("/debug-jobs")
+async def debug_jobs():
+    from utils.job_queue import job_queue
+    return {
+        job_id: {
+            "project_id": job.project_id,
+            "step": job.step,
+            "progress": job.progress,
+            "message": job.message,
+            "error": job.error,
+        }
+        for job_id, job in job_queue._jobs.items()
+    }

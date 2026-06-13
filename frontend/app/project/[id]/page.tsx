@@ -32,6 +32,7 @@ export default function ProjectPage() {
 
   // Derived voice provider state
   const isF5Mode =
+    (project?.config?.tts_provider as string | undefined) === "f5tts" ||
     (project?.config?.voice_provider as string | undefined) === "f5tts";
   const f5AudioReady = project?.voice_generation_status === "completed";
 

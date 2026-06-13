@@ -251,6 +251,8 @@ def _duration_band(duration: int) -> str:
     return "long"
 
 
+from models.schemas import LanguageMode
+
 def build_script_prompt(
     topic: str,
     duration: int,
@@ -261,6 +263,7 @@ def build_script_prompt(
     lesson_plan: dict = None,
     concept_graph: dict = None,
     assigned_scene_concepts: dict = None,
+    language_mode: LanguageMode = LanguageMode.ENGLISH,
 ) -> str:
     """Build the full educational script generation user prompt.
 
@@ -273,6 +276,7 @@ def build_script_prompt(
     - Added quality_feedback injection for rewrite passes
     - Narration length is driven by teaching need, not word budgets
     - Phase 6: Injects concept graph and assigned scene concepts to guide scene topics.
+    - Multi-Language support: Injects guidelines for English or natural Roman script Hinglish.
 
     Args:
         topic: Subject to teach.
@@ -284,6 +288,7 @@ def build_script_prompt(
         lesson_plan: Pre-generated lesson plan dict from the lesson planner.
         concept_graph: Concept graph dictionary.
         assigned_scene_concepts: Mapping of scene index (str or int) to list of assigned concepts.
+        language_mode: Target narration language mode (english or hinglish).
 
     Returns:
         User-facing prompt string for the script generation LLM call.
@@ -294,6 +299,39 @@ def build_script_prompt(
     domain = _detect_domain(topic)
     domain_examples = _DOMAIN_EXAMPLES.get(domain, _DOMAIN_EXAMPLES["general"])
     level_guidance = _LEVEL_GUIDANCE.get(educational_level, _LEVEL_GUIDANCE["high_school"])
+
+    # ── Language mode injection ──────────────────────────────────────────────
+    if language_mode == LanguageMode.HINGLISH:
+        language_instructions = """
+━━━ HINGLISH NARRATION MODE RULES (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You MUST generate the narration in natural, conversational Hinglish (a mixture of English and Hindi commonly spoken in India).
+Follow these rules strictly:
+1. TECHNICAL ISOLATION: Only translate/adapt the `narration` field of the JSON. Do NOT translate or modify the `title`, `visual_description`, `keywords`, or any `labels`, `equations`, `code snippets`, or `diagram text` inside visuals. These must remain fully in English.
+2. ROMAN SCRIPT ONLY: You MUST write the Hinglish narration using Roman script (Latin alphabet). Never use Devanagari characters (e.g. use "Force ek push ya pull hota hai", NOT "Force एक push ya pull hota hai").
+3. Keep ALL scientific and technical terminology in English (e.g., "Force", "Acceleration", "Photosynthesis", "Carbon Dioxide", "Gravity", "DNA", "CPU", "Binary Search", "Operating System" must remain in English).
+4. Explanations must be in Hinglish. E.g., "Force ek push ya pull hota hai. Jab kisi object par force lagta hai, to uski motion change ho sakti hai."
+5. Use a spoken-teacher tone. Use Hindi conversational transition/expression words naturally, like: "Socho...", "Maan lo...", "Ab imagine karo...", "Ek simple example lete hain...".
+6. Avoid pure Hindi textbook vocabulary. Never say things like "Bal vastu ko gati pradan karta hai". Say: "Force kisi object ki motion ko change kar sakta hai".
+7. Keep educational quality unchanged. Do not simplify concepts excessively; just adapt the narration language.
+"""
+    elif language_mode == LanguageMode.HINDI:
+        language_instructions = """
+━━━ HINDI NARRATION MODE RULES (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You MUST generate the narration in pure, natural Hindi written in Devanagari script.
+Follow these rules strictly:
+1. TECHNICAL ISOLATION: Only translate/adapt the `narration` field of the JSON. Do NOT translate or modify the `title`, `visual_description`, `keywords`, or any `labels`, `equations`, `code snippets`, or `diagram text` inside visuals. These must remain fully in English.
+2. DEVANAGARI SCRIPT: Write all narration text in Devanagari script. E.g., "बल एक धक्का या खिंचाव होता है।"
+3. Scientific terms may use common Hindi transliterations where widely accepted (e.g., "बल" for Force, "त्वरण" for Acceleration, "घर्षण" for Friction). For less common terms like "DNA" or "CPU", keep the English term.
+4. Use a warm spoken-teacher tone in Hindi. Use natural Hindi transitions: "अब सोचिए...", "मान लीजिए...", "एक उदाहरण लेते हैं...", "तो अब समझते हैं..."
+5. Keep educational quality unchanged. Do not simplify concepts; adapt the narration language to Hindi.
+6. The narration must sound natural when spoken aloud — avoid overly formal or textbook Hindi.
+"""
+    else:
+        language_instructions = """
+━━━ ENGLISH NARRATION MODE RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You MUST generate the narration in professional educational English.
+E.g., "Newton's First Law states that an object at rest remains at rest unless acted upon by an external force."
+"""
 
     # ── Scene count ──────────────────────────────────────────────────────────
     if lesson_plan.get("estimated_scene_count"):
@@ -402,6 +440,8 @@ Advisory word range per scene narration: {words_advisory_min}–{words_advisory_
 
 ━━━ REAL-WORLD EXAMPLES FOR THIS TOPIC (use these freely) ━━━━━━━━━━━━━━━━
 {domain_examples}
+
+{language_instructions}
 
 ━━━ REQUIRED TEACHING ARC ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Follow this general learning progression (adapt scene types to topic):

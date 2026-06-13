@@ -61,13 +61,16 @@ overall_score < dynamic_threshold  → needs_rewrite = true
 Output valid JSON only. No markdown. No explanation."""
 
 
-def build_quality_review_prompt(script_data: dict, educational_level: str, lesson_plan: dict = None) -> str:
+from models.schemas import LanguageMode
+
+def build_quality_review_prompt(script_data: dict, educational_level: str, lesson_plan: dict = None, language_mode: LanguageMode = LanguageMode.ENGLISH) -> str:
     """Build the quality review prompt from a generated script dict.
 
     Args:
         script_data: The raw dict from the LLM script generation response.
         educational_level: Target educational level for the script.
         lesson_plan: The lesson plan dictionary to check objectives/misconceptions coverage.
+        language_mode: Target narration language mode (english or hinglish).
 
     Returns:
         Prompt string for the quality review LLM call.
@@ -116,6 +119,25 @@ def build_quality_review_prompt(script_data: dict, educational_level: str, lesso
     )
     has_hook = any(s.get("scene_type") == "HOOK" for s in scenes)
 
+    # ── Language mode quality review instructions ───────────────────────────
+    if language_mode == LanguageMode.HINGLISH:
+        language_instructions = """
+━━━ HINGLISH QUALITY REVIEW RULES (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The script was generated in HINGLISH mode.
+When evaluating quality:
+1. Do NOT penalize the script for using Hindi words, conversational phrases, or mixed grammatical structures (Hinglish narration). This is intentional and expected.
+2. Evaluate 'human_naturalness_score' and 'engagement_score' based on whether it is a natural, conversational Hinglish flow that a teacher in India would use to speak to a student (e.g. "Socho...", "Maan lo...").
+3. Make sure all technical and scientific terminology (e.g. Force, Acceleration, Photosynthesis) is in English. If technical terminology is in Devanagari Hindi (e.g., "gati", "bal"), the score should be lower.
+4. Ensure explanations are in Hinglish, not pure Hindi (which is dry and formal) or pure English.
+5. All visual descriptions, title, and keywords should still be in English. Verify that ONLY the narration field contains Hinglish.
+6. Verify that there are absolutely NO Devanagari script characters (e.g. "एक", "बल") in the narration. It must be written in Roman script only.
+"""
+    else:
+        language_instructions = """
+━━━ ENGLISH QUALITY REVIEW RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The script was generated in ENGLISH mode. Narration must be fully in professional educational English.
+"""
+
     return f"""Review this educational whiteboard video script for narration quality.
 
 Video Title: {title}
@@ -142,6 +164,8 @@ Pedagogical Repetition Telemetry (Pre-calculated):
 
 Scene Content Details:
 {json.dumps(scenes_for_review, indent=2, ensure_ascii=False)}
+
+{language_instructions}
 
 Evaluate carefully according to the 11 SCORING DIMENSIONS.
 For every dimension, output a nested structured feedback dictionary.

@@ -1,6 +1,18 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+
+class LanguageMode(str, Enum):
+    ENGLISH = "english"
+    HINDI = "hindi"
+    HINGLISH = "hinglish"
+
+
+class TTSProvider(str, Enum):
+    F5TTS = "f5tts"
+    EDGE_TTS = "edge_tts"
+    XTTS_HINDI = "xtts_hindi"
 
 
 class PipelineStep(str, Enum):
@@ -26,11 +38,31 @@ class GenerateScriptRequest(BaseModel):
     style: str = "whiteboard"
     voice: str = "male"
     language: str = "english"
+    language_mode: LanguageMode = LanguageMode.ENGLISH
     voice_provider: str = "edge"          # edge | f5tts
+    tts_provider: Optional[str] = None    # f5tts | edge_tts
     avatar_provider: Optional[str] = None # future: liveportrait | musetalk | sadtalker
     # Educational level — adapts vocabulary, depth, analogy sophistication
     # Choices: middle_school | high_school | college | competitive_exam
     educational_level: str = "high_school"
+
+    @model_validator(mode="after")
+    def resolve_tts_provider(self) -> 'GenerateScriptRequest':
+        if not self.tts_provider:
+            # Hindi and Hinglish → XTTS Hindi (only provider with verified quality)
+            if self.language_mode in (LanguageMode.HINDI, LanguageMode.HINGLISH):
+                self.tts_provider = TTSProvider.XTTS_HINDI.value
+            elif self.voice_provider == "f5tts":
+                self.tts_provider = TTSProvider.F5TTS.value
+            else:
+                self.tts_provider = TTSProvider.EDGE_TTS.value
+
+        valid_providers = [p.value for p in TTSProvider]
+        if self.tts_provider not in valid_providers:
+            raise ValueError(
+                f"Unsupported tts_provider '{self.tts_provider}'. Must be one of {valid_providers}"
+            )
+        return self
 
 
 class GenerateScenesRequest(BaseModel):
@@ -68,6 +100,7 @@ class SceneSchema(BaseModel):
     scene_type: Optional[str] = None
     # Natural bridging phrase spoken at the end to connect to the next scene
     transition_phrase: Optional[str] = None
+    language_mode: Optional[LanguageMode] = None
 
 
 class LessonPlan(BaseModel):
@@ -126,6 +159,7 @@ class ScriptSchema(BaseModel):
     title: str
     total_duration: float
     scenes: List[SceneSchema]
+    language_mode: Optional[LanguageMode] = None
 
 
 class Position(BaseModel):

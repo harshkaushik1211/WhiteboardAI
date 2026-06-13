@@ -99,8 +99,7 @@ async def build_scene_plans_from_ai_image(
 
     async def _extract_strokes(scene, rel: str) -> str:
         async with stroke_sem:
-            return await asyncio.to_thread(
-                extract_strokes_for_project_image,
+            return await extract_strokes_for_project_image(
                 project_id,
                 rel,
                 scene.keywords,

@@ -16,18 +16,20 @@ from utils.file_manager import load_json
 # Avoid circular imports: providers import from factory indirectly.
 _PROVIDERS: dict[str, str] = {
     "edge": "services.voice.providers.edge.EdgeTTSProvider",
+    "edge_tts": "services.voice.providers.edge.EdgeTTSProvider",
     "f5tts": "services.voice.providers.f5.F5TTSProvider",
+    "xtts_hindi": "services.voice.providers.xtts_hindi.XTTSHindiProvider",
 }
 
-_DEFAULT_PROVIDER = "edge"
+_DEFAULT_PROVIDER = "edge_tts"
 
 
 def get_voice_provider(project_id: str) -> VoiceProvider:
     """Return the correct :class:`VoiceProvider` for *project_id*.
 
     Reads ``config.json`` from the project directory.  If the
-    ``voice_provider`` key is absent (legacy project) or unknown, the
-    Edge-TTS provider is returned so rendering is never broken.
+    ``tts_provider`` (or legacy ``voice_provider``) key is absent
+    or unknown, the Edge-TTS provider is returned.
 
     Args:
         project_id: The project whose config should be inspected.
@@ -37,7 +39,7 @@ def get_voice_provider(project_id: str) -> VoiceProvider:
         ``await provider.generate(...)``.
     """
     config = load_json(project_id, "config.json") or {}
-    provider_key = config.get("voice_provider", _DEFAULT_PROVIDER)
+    provider_key = config.get("tts_provider") or config.get("voice_provider") or _DEFAULT_PROVIDER
 
     if provider_key not in _PROVIDERS:
         provider_key = _DEFAULT_PROVIDER
@@ -51,10 +53,10 @@ def get_voice_provider(project_id: str) -> VoiceProvider:
 
 
 def get_provider_key(project_id: str) -> str:
-    """Return the provider key string for *project_id* (e.g. ``"edge"``).
+    """Return the provider key string for *project_id* (e.g. ``"edge_tts"``).
 
     Useful for conditional logic that does not need a full provider instance.
     """
     config = load_json(project_id, "config.json") or {}
-    key = config.get("voice_provider", _DEFAULT_PROVIDER)
+    key = config.get("tts_provider") or config.get("voice_provider") or _DEFAULT_PROVIDER
     return key if key in _PROVIDERS else _DEFAULT_PROVIDER
